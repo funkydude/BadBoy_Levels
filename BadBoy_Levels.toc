@@ -1,0 +1,12 @@
+## Interface: 30100
+## Version: 1.0
+## Title: BadBoy_Levels
+## Notes: Filter whispers by level.
+## Author: Funkydude
+## SavedVariables: BADBOY_LEVEL
+## Dependencies: BadBoy
+## X-Credits: 
+## X-Category: Chat/Communication
+## X-License: All Rights Reserved
+
+BadBoy_Levels.lua
