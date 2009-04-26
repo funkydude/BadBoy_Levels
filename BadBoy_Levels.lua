@@ -51,7 +51,6 @@ badboy:SetScript("OnUpdate", function(_, e)
 	t = t + e
 	if t > 1 then
 		t = 0
-		print(t)
 		FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE")
 		SetWhoToUI(1)
 		for k in pairs(maybe) do
