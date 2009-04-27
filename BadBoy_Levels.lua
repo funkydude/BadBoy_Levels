@@ -22,7 +22,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 					--lower than level 3, or a level defined by the user = bad
 					bad[player] = true
 				else
-					good[player] = true --Higher = good
+					good[player] = true --higher = good
 					--get all the frames, incase whispers are being recieved in more that one chat frame
 					for _, v in pairs(maybe[player]) do
 						--get all the chat lines (queued if multiple) for restoration back to the chat frame
@@ -57,6 +57,8 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			good[n] = true
 		end
 	else
+		--back down if not in a guild
+		if not IsInGuild() then return end
 		--when people join/leave the roster doesn't update, but we're told it's dirty
 		--so just force an update, we don't update the list until it's clean
 		if update then GuildRoster() return end
