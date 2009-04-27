@@ -1,5 +1,4 @@
 
-BADBOY_LEVEL = BADBOY_LEVEL or 3
 local good, bad, maybe, badboy = {}, {}, {}, CreateFrame("Frame", "BadBoy_Levels")
 
 badboy:Hide()
@@ -12,21 +11,24 @@ badboy:SetScript("OnEvent", function(_, evt)
 		badboy:Hide()
 		FriendsFrame:RegisterEvent("WHO_LIST_UPDATE")
 		SetWhoToUI(0)
-		local player, _, level = GetWhoInfo(1)
-		if maybe[player] then
-			if level <= tonumber(BADBOY_LEVEL) then
-				bad[player] = true
-			else
-				good[player] = true
-				for _, v in pairs(maybe[player]) do
-					for _, p in pairs(v) do
-						local f = unpack(p)
-						f:GetScript("OnEvent")(unpack(p))
+		local num = GetNumWhoResults()
+		for i = 1, num do
+			local player, _, level = GetWhoInfo(i)
+			if maybe[player] then
+				if level <= (tonumber(BADBOY_LEVEL) or 3) then
+					bad[player] = true
+				else
+					good[player] = true
+					for _, v in pairs(maybe[player]) do
+						for _, p in pairs(v) do
+							local f = unpack(p)
+							f:GetScript("OnEvent")(unpack(p))
+						end
 					end
 				end
+				wipe(maybe[player])
+				maybe[player] = nil
 			end
-			wipe(maybe[player])
-			maybe[player] = nil
 		end
 		for k in pairs(maybe) do
 			badboy:Show()
@@ -62,7 +64,7 @@ end)
 local function filter(...)
 	local flag = select(8, ...)
 	local player = select(4, ...)
-	if flag == "GM" or good[player] then return end
+	if good[player] or flag == "GM" then return end
 	if not bad[player] then
 		if not maybe[player] then maybe[player] = {} end
 		local f = ...
