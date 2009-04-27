@@ -34,7 +34,9 @@ badboy:SetScript("OnEvent", function(_, evt)
 			badboy:Show()
 		end
 	elseif evt == "PLAYER_LOGIN" then
-		GuildRoster()
+		if IsInGuild() then
+			GuildRoster()
+		end
 		ShowFriends()
 	else
 		local num = GetNumFriends()
@@ -62,8 +64,7 @@ badboy:SetScript("OnUpdate", function(_, e)
 end)
 
 local function filter(...)
-	local flag = select(8, ...)
-	local player = select(4, ...)
+	local flag, player = select(8, ...), select(4, ...)
 	if good[player] or flag == "GM" then return end
 	if not bad[player] then
 		if not maybe[player] then maybe[player] = {} end
