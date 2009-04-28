@@ -18,7 +18,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		for i = 1, num do
 			local player, _, level = GetWhoInfo(i)
 			if maybe[player] then --do we need to process this person?
-				if level <= (tonumber(BADBOY_LEVEL) or 3) then
+				if level <= (tonumber(BADBOY_LEVEL) or 2) then
 					--lower than level 3, or a level defined by the user = bad
 					bad[player] = true
 				else
@@ -76,7 +76,7 @@ end)
 local t = 0
 badboy:SetScript("OnUpdate", function(_, e)
 	t = t + e
-	if t > 1 then --throttle, request data once a second
+	if t > 1 then --throttle, request data once a second until we get it, it might be on cooldown
 		t = 0
 		FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE") --don't show the who popup
 		SetWhoToUI(1) --don't show results in chat
