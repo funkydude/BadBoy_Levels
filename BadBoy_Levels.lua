@@ -18,7 +18,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		for i = 1, num do
 			local player, _, level = GetWhoInfo(i)
 			if maybe[player] then --do we need to process this person?
-				if level <= (tonumber(BADBOY_LEVEL) or 2) then
+				if level <= (tonumber(BADBOY_LEVEL) or 1) then
 					--lower than level 3, or a level defined by the user = bad
 					bad[player] = true
 				else
