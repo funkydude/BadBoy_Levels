@@ -61,7 +61,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		for i = 1, num do
 			local n = GetFriendInfo(i)
 			--add friend to good list
-			good[n] = true
+			if n then good[n] = true end
 		end
 	else
 		--back down if not in a guild
@@ -74,7 +74,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		for i = 1, num do
 			local n = GetGuildRosterInfo(i)
 			--add guild member to good list
-			good[n] = true
+			if n then good[n] = true end
 		end
 	end
 end)
