@@ -37,7 +37,9 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 							local f = unpack(p)
 							--this player is good, we must restore the whisper(s) back to chat
 							f:GetScript("OnEvent")(unpack(p))
+							wipe(p) --remove player data table
 						end
+						wipe(v) --remove player data table
 					end
 				end
 				wipe(maybe[player]) --remove player data table
@@ -100,7 +102,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 
 	--not good or GM, added to maybe
 	if not maybe[player] then maybe[player] = {} end
-	local f = ...
+	local f = tostring(...)
 	--one table per chatframe, incase we got whispers on 2+ chatframes
 	if not maybe[player][f] then maybe[player][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
