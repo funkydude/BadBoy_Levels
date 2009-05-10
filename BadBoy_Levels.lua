@@ -1,6 +1,6 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy = {}, {}, CreateFrame("Frame", "BadBoy_Levels")
+local good, maybe, badboy, t, wholib = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), 1, nil
 local whisp = "You need to be level %d to whisper me."
 
 --[[local L = GetLocale()
@@ -16,8 +16,11 @@ badboy:RegisterEvent("GUILD_ROSTER_UPDATE")
 badboy:SetScript("OnEvent", function(_, evt, update)
 	if evt == "WHO_LIST_UPDATE" then
 		badboy:Hide() --stop the onupdate
-		FriendsFrame:RegisterEvent("WHO_LIST_UPDATE") --restore friends frame
-		SetWhoToUI(0) --restore friends frame
+		t = 1 --reset counter
+		if not wholib then --Only if WhoLib isn't running
+			FriendsFrame:RegisterEvent("WHO_LIST_UPDATE") --restore friends frame
+			SetWhoToUI(0) --restore friends frame
+		end
 		--we get all who results to prevent any strange situation where the player we want might be 2nd in
 		--the list, if we only scanned first in the list, we would create an infinite loop
 		local num = GetNumWhoResults()
@@ -57,6 +60,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		end
 		ShowFriends()
 		good[UnitName("player")] = true --add ourself
+		wholib = _G.LibStub and _G.LibStub:GetLibrary("LibWho-2.0", true) or nil --I really dislike this lib
 	elseif evt == "FRIENDLIST_UPDATE" then
 		--get all online and offline friends
 		local num = GetNumFriends()
@@ -81,11 +85,10 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 	end
 end)
 
-local t = 0
 badboy:SetScript("OnUpdate", function(_, e)
 	t = t + e
 	if t > 1 then --throttle, request data once a second until we get it, it might be on cooldown
-		t = 0
+		t = 0 --reset counter
 		FriendsFrame:UnregisterEvent("WHO_LIST_UPDATE") --don't show the who popup
 		SetWhoToUI(1) --don't show results in chat
 		for k in pairs(maybe) do
@@ -112,7 +115,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
 		maybe[player][f][id][i] = select(i, ...)
 	end
-	badboy:Show() --start the onupdate data request
+	if wholib then
+		wholib:Who(player) --We have to use wholib if it's installed, it doesn't like others using who
+	else
+		badboy:Show() --start the onupdate data request
+	end
 	return true --filter everything not good (maybe) and not GM
 end)
 
