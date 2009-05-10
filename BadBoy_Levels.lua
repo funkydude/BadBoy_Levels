@@ -3,10 +3,13 @@
 local good, maybe, badboy, t, wholib = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), 1, nil
 local whisp = "You need to be level %d to whisper me."
 
---[[local L = GetLocale()
-if L == "frFR" then
-	whisp = ""
-end]]
+local L = GetLocale()
+if L == "esES" or L == "esMX" then
+	whisp = "Necesitas ser nivel %d para susurrarme."
+elseif L == "deDE" then
+	whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
+end
+L = nil
 
 badboy:Hide() --hide, don't run the onupdate
 badboy:RegisterEvent("WHO_LIST_UPDATE")
