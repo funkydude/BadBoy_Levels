@@ -18,9 +18,9 @@ badboy:RegisterEvent("FRIENDLIST_UPDATE")
 badboy:RegisterEvent("GUILD_ROSTER_UPDATE")
 badboy:SetScript("OnEvent", function(_, evt, update)
 	if evt == "WHO_LIST_UPDATE" then
-		badboy:Hide() --stop the onupdate
-		t = 1 --reset counter
 		if not wholib then --Only if WhoLib isn't running
+			badboy:Hide() --stop the onupdate
+			t = 1 --reset counter
 			FriendsFrame:RegisterEvent("WHO_LIST_UPDATE") --restore friends frame
 			SetWhoToUI(0) --restore friends frame
 		end
@@ -31,7 +31,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			local player, _, level = GetWhoInfo(i)
 			if maybe[player] then --do we need to process this person?
 				if level <= (tonumber(BADBOY_LEVEL) or 1) then
-					--lower than level 1, or a level defined by the user = bad
+					--lower than or equal to level 1, or a level defined by the user = bad
 					--so whisper the bad player what level they must be to whisper us
 					SendChatMessage(whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2), "WHISPER", nil, player)
 				else
@@ -127,8 +127,9 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 end)
 
 --outgoing whisper filtering function
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
+	good[player] = true --If we want to whisper someone, they're good
 	local sent = whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2)
-	if msg == sent then return true end
+	if msg == sent then return true end --filter out the reply whisper
 end)
 
