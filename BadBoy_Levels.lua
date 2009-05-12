@@ -128,8 +128,8 @@ end)
 
 --outgoing whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
-	good[player] = true --If we want to whisper someone, they're good
 	local sent = whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2)
 	if msg == sent then return true end --filter out the reply whisper
+	good[player] = true --If we want to whisper someone, they're good
 end)
 
