@@ -1,15 +1,18 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy, t, wholib = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), 1, nil
+local good, maybe, count, badboy, t, wholib = {}, {}, {}, CreateFrame("Frame", "BadBoy_Levels"), 1, nil
 local whisp = "You need to be level %d to whisper me."
 
-local L = GetLocale()
-if L == "esES" or L == "esMX" then
-	whisp = "Necesitas ser nivel %d para susurrarme."
-elseif L == "deDE" then
-	whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
+do
+	local L = GetLocale()
+	if L == "esES" or L == "esMX" then
+		whisp = "Necesitas ser nivel %d para susurrarme."
+	elseif L == "deDE" then
+		whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
+	elseif L == "frFR" then
+		whisp = "Vous devez être au moins niveau %d pour me chuchoter."
+	end
 end
-L = nil
 
 badboy:Hide() --hide, don't run the onupdate
 badboy:RegisterEvent("WHO_LIST_UPDATE")
@@ -27,13 +30,22 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		--we get all who results to prevent any strange situation where the player we want might be 2nd in
 		--the list, if we only scanned first in the list, we would create an infinite loop
 		local num = GetNumWhoResults()
+		local found = nil
 		for i = 1, num do
 			local player, _, level = GetWhoInfo(i)
 			if maybe[player] then --do we need to process this person?
+				count[player] = nil --remove counter entry
+				found = true --we found someone in this who
 				if level <= (tonumber(BADBOY_LEVEL) or 1) then
 					--lower than or equal to level 1, or a level defined by the user = bad
 					--so whisper the bad player what level they must be to whisper us
 					SendChatMessage(whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2), "WHISPER", nil, player)
+					for _, v in pairs(maybe[player]) do
+						for _, p in pairs(v) do
+							wipe(p) --remove player data table
+						end
+						wipe(v) --remove player data table
+					end
 				else
 					good[player] = true --higher = good
 					--get all the frames, incase whispers are being recieved in more that one chat frame
@@ -52,9 +64,32 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				maybe[player] = nil --remove remaining empty table
 			end
 		end
+		if not found then -- we didn't find anyone in this who, should really never happen
+			for k,v in pairs(count) do --cycle through players in counter
+				count[k] = v + 1 --add 1 to every player
+				--if player has been who'd 10 times (1 minute, reasonable relog time), give up and remove the whisper,
+				--it was probably a quick log on/off gold spammer
+				if v > 9 then
+					for _, n in pairs(maybe[k]) do
+						for _, p in pairs(n) do
+							wipe(p) --remove player data table
+						end
+						wipe(n) --remove player data table
+					end
+					wipe(maybe[k]) --remove player data table
+					maybe[k] = nil --remove remaining empty table
+					count[k] = nil --remove player counter
+				end
+			end
+		end
 		--turn on the onupdate if we still have players for processing
 		for k in pairs(maybe) do
-			badboy:Show()
+			if wholib then
+				wholib:Who(k) --We have to use wholib if it's installed, it doesn't like others using who
+			else
+				badboy:Show() --start the onupdate data request
+			end
+			return
 		end
 	elseif evt == "PLAYER_LOGIN" then
 		--update our safe list on login with guild/friends
@@ -96,16 +131,19 @@ badboy:SetScript("OnUpdate", function(_, e)
 		SetWhoToUI(1) --don't show results in chat
 		for k in pairs(maybe) do
 			SendWho(k) --sendwho any players needing processing
+			return
 		end
 	end
 end)
 
 --main whisper filtering cuntion
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
-	local flag, player = select(8, ...), select(4, ...)
 	--don't filter if good or GM
-	if good[player] or flag == "GM" then return end
-
+	local player = select(4, ...)
+	if good[player] then return end
+	local flag = select(8, ...)
+	if flag == "GM" then return end
+ 
 	--not good or GM, added to maybe
 	if not maybe[player] then maybe[player] = {} end
 	local f = tostring(...)
@@ -123,6 +161,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	else
 		badboy:Show() --start the onupdate data request
 	end
+	count[player] = 0 --add to who counter entry
 	return true --filter everything not good (maybe) and not GM
 end)
 
