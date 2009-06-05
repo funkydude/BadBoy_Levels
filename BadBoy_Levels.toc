@@ -1,9 +1,9 @@
 ## Interface: 30100
-## Version: 1.5.0
+## Version: 1.5.1
 ## Title: BadBoy_Levels
 ## Notes: Filter whispers by level, minimally.
 ## Notes-deDE: Filtert Flüsternachrichten nach Level, minimalistisch.
-## Notes-frFR: Filtrer les chuchotements par niveau, au minimum.
+## Notes-frFR: Filtre les chuchotements par niveau, au minimum.
 ## Author: Funkydude
 ## SavedVariables: BADBOY_LEVEL
 ## Dependencies: BadBoy
