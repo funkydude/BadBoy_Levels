@@ -11,6 +11,8 @@ do
 		whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
 	elseif L == "frFR" then
 		whisp = "Vous devez être au moins de niveau %d pour me chuchoter."
+	elseif L == "ruRU" then
+		whisp = "Вы должны быть уровнем не ниже %d, что бы шептать мне."
 	end
 end
 
