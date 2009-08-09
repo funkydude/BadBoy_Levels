@@ -154,7 +154,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--one table per id, incase we got more than one whisper from a player whilst still processing
 	local id = select(13, ...)
 	maybe[player][f][id] = {}
-	for i = 1, 13 do
+	for i = 1, 14 do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
 		maybe[player][f][id][i] = select(i, ...)
 	end
