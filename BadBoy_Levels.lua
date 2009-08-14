@@ -19,6 +19,7 @@ do
 end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
+	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
 	if not filterName then return end
 	if msg == (ERR_FRIEND_ADDED_S):format(filterName) or msg == (ERR_FRIEND_REMOVED_S):format(filterName) then
 		return true
@@ -36,6 +37,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			GuildRoster()
 		end
 		ShowFriends()
+		--do a friends check to see if we need to warn the user to free up some slots
 		local num = GetNumFriends()
 		if num and num > 48 then
 			print("|cFF33FF99BadBoy_Levels|r: "..err_one)
@@ -43,9 +45,10 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		end
 		good[UnitName("player")] = true --add ourself
 	elseif evt == "FRIENDLIST_UPDATE" then
-		local num = GetNumFriends()
+		local num = GetNumFriends() --get total friends
 		for i = 1, num do
 			local player, level = GetFriendInfo(i)
+			--sometimes a friend will return nil, I have no idea why, so force another update and return on the spot
 			if not player then
 				ShowFriends()
 				return
@@ -108,7 +111,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local flag = select(8, ...)
 	if flag == "GM" then return end
 
-	filterName = player
+	filterName = player --add name to filter to remove player added/removed from friends messages
 	--not good or GM, added to maybe
 	if not maybe[player] then maybe[player] = {} end
 	local f = tostring(...)
@@ -121,7 +124,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
 		maybe[player][f][id][i] = select(i, ...)
 	end
-	AddFriend(player)
+	AddFriend(player) --add player to friends
 	return true --filter everything not good (maybe) and not GM
 end)
 
