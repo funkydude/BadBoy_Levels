@@ -39,7 +39,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		local num = GetNumFriends()
 		if num and num > 48 then
 			print("|cFF33FF99BadBoy_Levels|r: "..err_one)
-			print("|cFF33FF99BadBoy_Levels|r: "..err_two:format(num-20))
+			print("|cFF33FF99BadBoy_Levels|r: "..err_two:format(num-48))
 		end
 		good[UnitName("player")] = true --add ourself
 	elseif evt == "FRIENDLIST_UPDATE" then
