@@ -51,6 +51,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				--add friends to safe list
 				if n then good[n] = true end
 			end
+			return
 		end
 
 		local num = GetNumFriends() --get total friends
@@ -108,6 +109,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 end)
 
 --main whisper filtering cuntion
+local lastId = 0
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--don't filter if good or GM
 	local player = select(4, ...)
@@ -128,7 +130,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
 		maybe[player][f][id][i] = select(i, ...)
 	end
-	AddFriend(player) --add player to friends
+	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
+	if lastId ~= id then
+		lastId = id
+		AddFriend(player) --add player to friends
+	end
 	return true --filter everything not good (maybe) and not GM
 end)
 
