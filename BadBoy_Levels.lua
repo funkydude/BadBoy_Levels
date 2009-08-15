@@ -26,7 +26,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
 	end
 end)
 
-badboy:Hide() --hide, don't run the onupdate
 badboy:RegisterEvent("PLAYER_LOGIN")
 badboy:RegisterEvent("FRIENDLIST_UPDATE")
 badboy:RegisterEvent("GUILD_ROSTER_UPDATE")
@@ -54,7 +53,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				return
 			end
 			if maybe[player] then --do we need to process this person?
-				RemoveFriend(i) --Remove player from friends list
+				RemoveFriend(player) --Remove player from friends list
 				if level <= (tonumber(BADBOY_LEVEL) or 1) then
 					--lower than or equal to level 1, or a level defined by the user = bad
 					--so whisper the bad player what level they must be to whisper us
