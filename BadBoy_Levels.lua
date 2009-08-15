@@ -1,6 +1,6 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy, filterName = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), nil
+local good, maybe, badboy, filterName, login = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), nil, nil
 local whisp = "You need to be level %d to whisper me."
 local err_one = "You should have a maximum of 48 friends for this addon to work properly."
 local err_two = "You have more than 48, remove %d friends."
@@ -36,14 +36,23 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			GuildRoster()
 		end
 		ShowFriends()
-		--do a friends check to see if we need to warn the user to free up some slots
-		local num = GetNumFriends()
-		if num and num > 48 then
-			print("|cFF33FF99BadBoy_Levels|r: "..err_one)
-			print("|cFF33FF99BadBoy_Levels|r: "..err_two:format(num-48))
-		end
 		good[UnitName("player")] = true --add ourself
 	elseif evt == "FRIENDLIST_UPDATE" then
+		if not login then --run on login only
+			login = true
+			--do a friends check to see if we need to warn the user to free up some slots
+			local num = GetNumFriends()
+			if num > 48 then
+				print("|cFF33FF99BadBoy_Levels|r: "..err_one)
+				print("|cFF33FF99BadBoy_Levels|r: "..err_two:format(num-48))
+			end
+			for i = 1, num do
+				local n = GetFriendInfo(i)
+				--add friends to safe list
+				if n then good[n] = true end
+			end
+		end
+
 		local num = GetNumFriends() --get total friends
 		for i = 1, num do
 			local player, level = GetFriendInfo(i)
@@ -80,10 +89,6 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				end
 				wipe(maybe[player]) --remove player data table
 				maybe[player] = nil --remove remaining empty table
-			else
-				--if they are not in the maybe list, the friend already existed or was added manually
-				--to the friends list, so we should add them to the safe list too
-				good[player] = true
 			end
 		end
 	else
