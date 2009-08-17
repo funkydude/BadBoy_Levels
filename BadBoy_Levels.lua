@@ -2,8 +2,7 @@
 --good players(guildies/friends), maybe(for processing)
 local good, maybe, badboy, filterName, login = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), nil, nil
 local whisp = "You need to be level %d to whisper me."
-local err_one = "You should have a maximum of 48 friends for this addon to work properly."
-local err_two = "You have more than 48, remove %d friends."
+local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
 do
 	local L = GetLocale()
@@ -19,6 +18,10 @@ do
 end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
+	if msg == ERR_FRIEND_LIST_FULL then
+		print(err)
+		return
+	end
 	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
 	if not filterName then return end
 	if msg == (ERR_FRIEND_ADDED_S):format(filterName) or msg == (ERR_FRIEND_REMOVED_S):format(filterName) then
@@ -42,10 +45,6 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			login = true
 			--do a friends check to see if we need to warn the user to free up some slots
 			local num = GetNumFriends()
-			if num > 48 then
-				print("|cFF33FF99BadBoy_Levels|r: "..err_one)
-				print("|cFF33FF99BadBoy_Levels|r: "..err_two:format(num-48))
-			end
 			for i = 1, num do
 				local n = GetFriendInfo(i)
 				--add friends to safe list
