@@ -12,6 +12,7 @@ do
 		whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
 	elseif L == "frFR" then
 		whisp = "Vous devez être au moins de niveau %d pour me chuchoter."
+		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
 	elseif L == "ruRU" then
 		whisp = "Вы должны быть уровнем не ниже %d, что бы шептать мне."
 	end
@@ -19,7 +20,7 @@ end
 
 ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
 	if msg == ERR_FRIEND_LIST_FULL then
-		print(err)
+		print("|cFF33FF99BadBoy_Levels|r: ", err)
 		return
 	end
 	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
@@ -62,7 +63,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				return
 			end
 			if maybe[player] then --do we need to process this person?
-				RemoveFriend(player) --Remove player from friends list
+				RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 				if level <= (tonumber(BADBOY_LEVEL) or 1) then
 					--lower than or equal to level 1, or a level defined by the user = bad
 					--so whisper the bad player what level they must be to whisper us
@@ -132,7 +133,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
 	if lastId ~= id then
 		lastId = id
-		AddFriend(player) --add player to friends
+		AddFriend(player, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 	end
 	return true --filter everything not good (maybe) and not GM
 end)
