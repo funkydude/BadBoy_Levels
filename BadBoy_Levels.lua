@@ -56,7 +56,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 
 		local num = GetNumFriends() --get total friends
 		for i = 1, num do
-			local player, level = GetFriendInfo(i)
+			local player, level, class = GetFriendInfo(i)
 			--sometimes a friend will return nil, I have no idea why, so force another update and return on the spot
 			if not player then
 				ShowFriends()
@@ -64,10 +64,29 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			end
 			if maybe[player] then --do we need to process this person?
 				RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
-				if level <= (tonumber(BADBOY_LEVEL) or 1) then
+				--begin code for filtering Death Knights, we need to get the English class name from the return
+				local result
+				for k,v in pairs(LOCALIZED_CLASS_NAMES_FEMALE) do
+					if v == class then
+						result = k
+					end
+				end
+				if not result then
+					for k,v in pairs(LOCALIZED_CLASS_NAMES_MALE) do
+						if v == class then
+							result = k
+						end
+					end
+				end
+				if level <= (tonumber(BADBOY_LEVEL) or 1) or (level < 57 and result == "DEATHKNIGHT") then
 					--lower than or equal to level 1, or a level defined by the user = bad
+					--or lower than 57 and class is a Death Knight
 					--so whisper the bad player what level they must be to whisper us
-					SendChatMessage(whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2), "WHISPER", nil, player)
+					if result == "DEATHKNIGHT" then
+						SendChatMessage(whisp:format(57), "WHISPER", nil, player)
+					else
+						SendChatMessage(whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2), "WHISPER", nil, player)
+					end
 					for _, v in pairs(maybe[player]) do
 						for _, p in pairs(v) do
 							wipe(p) --remove player data table
@@ -141,7 +160,8 @@ end)
 --outgoing whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
 	local sent = whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2)
-	if msg == sent then return true end --filter out the reply whisper
+	local dksent = whisp:format(57)
+	if msg == sent or msg == dksent then return true end --filter out the reply whisper
 	good[player] = true --If we want to whisper someone, they're good
 end)
 
