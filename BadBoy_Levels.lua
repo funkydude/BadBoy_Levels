@@ -159,11 +159,9 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 end)
 
 --outgoing whisper filtering function
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
-	local sent = whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2)
-	local dksent = whisp:format(57)
-	--filter out the reply whisper, use find instead of a match to avoid not filtering drunken messages (..hic! etc.)
-	if msg:find(sent) or msg:find(dksent) then return true end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,_,player)
+	if good[player] then return end --Do nothing if on safe list
+	if filterName and player == filterName then return true end --Filter auto-response
 	good[player] = true --If we want to whisper someone, they're good
 end)
 
