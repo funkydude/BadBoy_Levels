@@ -10,6 +10,7 @@ do
 		whisp = "Necesitas ser nivel %d para susurrarme."
 	elseif L == "deDE" then
 		whisp = "Du musst Level %d sein, um mir etwas flüstern zu können."
+		err = "Du hast die maximale Anzahl an Freunden erreicht, bitte entferne 2, damit dieses Addon richtig funktioniert!"
 	elseif L == "frFR" then
 		whisp = "Vous devez être au moins de niveau %d pour me chuchoter."
 		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
@@ -161,7 +162,8 @@ end)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
 	local sent = whisp:format(BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2)
 	local dksent = whisp:format(57)
-	if msg == sent or msg == dksent then return true end --filter out the reply whisper
+	--filter out the reply whisper, use find instead of a match to avoid not filtering drunken messages (..hic! etc.)
+	if msg:find(sent) or msg:find(dksent) then return true end
 	good[player] = true --If we want to whisper someone, they're good
 end)
 
