@@ -133,7 +133,7 @@ local lastId = 0
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--don't filter if good or GM
 	local player = select(4, ...)
-	if good[player] then return end
+	if good[player] or player:find("%-") then return end
 	local flag = select(8, ...)
 	if flag == "GM" then return end
 
