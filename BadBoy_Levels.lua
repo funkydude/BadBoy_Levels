@@ -1,6 +1,6 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy, filterName, login = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), nil, nil
+local good, maybe, badboy, filterName, login = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), "", nil
 local whisp = "You need to be level %d to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
@@ -25,7 +25,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
 		return
 	end
 	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
-	if not filterName then return end
 	if msg == (ERR_FRIEND_ADDED_S):format(filterName) or msg == (ERR_FRIEND_REMOVED_S):format(filterName) then
 		return true
 	end
@@ -129,7 +128,6 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 end)
 
 --main whisper filtering cuntion
-local lastId = 0
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--don't filter if good or GM
 	local player = select(4, ...)
@@ -137,7 +135,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local flag = select(8, ...)
 	if flag == "GM" then return end
 
-	filterName = player --add name to filter to remove player added/removed from friends messages
 	--not good or GM, added to maybe
 	if not maybe[player] then maybe[player] = {} end
 	local f = tostring(...)
@@ -151,8 +148,8 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		maybe[player][f][id][i] = select(i, ...)
 	end
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
-	if lastId ~= id then
-		lastId = id
+	if player ~= filterName then
+		filterName = player --add name to filter to remove player added/removed from friends messages
 		AddFriend(player, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 	end
 	return true --filter everything not good (maybe) and not GM
@@ -161,7 +158,7 @@ end)
 --outgoing whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,_,player)
 	if good[player] then return end --Do nothing if on safe list
-	if filterName and player == filterName then return true end --Filter auto-response
+	if player == filterName then return true end --Filter auto-response
 	good[player] = true --If we want to whisper someone, they're good
 end)
 
