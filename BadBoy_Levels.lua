@@ -140,7 +140,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		local guid = select(14, ...)
 		local _, englishClass = GetPlayerInfoByGUID(guid)
 		if englishClass == "DEATHKNIGHT" then
-			filterTable[player] = 57
+			filterTable[player] = 58
 		else
 			filterTable[player] = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
 		end
