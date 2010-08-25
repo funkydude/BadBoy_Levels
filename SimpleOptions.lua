@@ -17,7 +17,7 @@ do
 	levelsBox:SetScript("OnHide", function(frame)
 		local n = tonumber(frame:GetText())
 		if not n or n == "" then frame:SetText(BADBOY_LEVEL or 1) print("|cFF33FF99BadBoy_Levels|r == "..(BADBOY_LEVEL or 1)) return end
-		if n <1 or n>79 then
+		if n < 1 then
 			frame:SetText(BADBOY_LEVEL or 1)
 			print("|cFF33FF99BadBoy_Levels|r == "..(BADBOY_LEVEL or 1))
 		else

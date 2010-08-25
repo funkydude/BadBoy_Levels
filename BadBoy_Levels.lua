@@ -8,7 +8,7 @@ do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
 		whisp = "BadBoy_Levels: Necesitas ser nivel %d para susurrarme."
-		err = "Has llegado a la cantidad máxima de amigos, quita 2 amigos para que este addon funcione propiamente. "
+		err = "Has llegado a la cantidad máxima de amigos, quita 2 amigos para que este addon funcione propiamente."
 	elseif L == "deDE" then
 		whisp = "BadBoy_Levels: Du musst Level %d sein, um mir etwas flüstern zu können."
 		err = "Du hast die maximale Anzahl an Freunden erreicht, bitte entferne 2, damit dieses Addon richtig funktioniert!"
@@ -46,7 +46,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 		good[UnitName("player")] = true --add ourself
 		--variable health check
 		if BADBOY_LEVEL and type(BADBOY_LEVEL) ~= "number" then BADBOY_LEVEL = nil end
-		if BADBOY_LEVEL and (BADBOY_LEVEL<1 or BADBOY_LEVEL>79) then BADBOY_LEVEL = nil end
+		if BADBOY_LEVEL and BADBOY_LEVEL < 1 then BADBOY_LEVEL = nil end
 		BadBoyLevelsEditBox:SetText(BADBOY_LEVEL or 1)
 	elseif evt == "FRIENDLIST_UPDATE" then
 		if not login then --run on login only
@@ -71,7 +71,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 					RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 					if level < filterTable[player] then
 						--lower than level 2, or a level defined by the user = bad,
-						--or lower than 57 and class is a Death Knight,
+						--or lower than 58 and class is a Death Knight,
 						--so whisper the bad player what level they must be to whisper us
 						SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
 						for _, v in pairs(maybe[player]) do
@@ -87,7 +87,11 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 							--get all the chat lines (queued if multiple) for restoration back to the chat frame
 							for _, p in pairs(v) do
 								--this player is good, we must restore the whisper(s) back to chat
-								ChatFrame_MessageEventHandler(unpack(p))
+								if IsAddOnLoaded("WIM") then --WIM compat
+									WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(unpack(p))
+								else
+									ChatFrame_MessageEventHandler(unpack(p))
+								end
 								wipe(p) --remove player data table
 							end
 							wipe(v) --remove player data table
@@ -114,7 +118,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 	end
 end)
 
---incoming whisper filtering funtion
+--incoming whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--don't filter if good, GM, or x-server
 	local player = select(4, ...)
@@ -125,25 +129,25 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	if not maybe[player] then maybe[player] = {} end --added to maybe
 	local f = ...
 	f = f:GetName()
+	if IsAddOnLoaded("WIM") and not f:find("WIM") then return true end --WIM compat
 	--one table per chatframe, incase we got whispers on 2+ chatframes
 	if not maybe[player][f] then maybe[player][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
 	local id = select(13, ...)
 	maybe[player][f][id] = {}
+	local n = IsAddOnLoaded("WIM") and 2 or 0 --WIM compat
 	for i = 1, select("#", ...) do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
-		maybe[player][f][id][i] = select(i, ...)
+		maybe[player][f][id][i] = select(i+n, ...)
 	end
+	--Decide the level to be filtered
+	local guid = select(14, ...)
+	local _, englishClass = GetPlayerInfoByGUID(guid)
+	local level = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
+	if englishClass == "DEATHKNIGHT" then level = 58 end
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
-	if not filterTable[player] then
-		--Decide the level to be filtered
-		local guid = select(14, ...)
-		local _, englishClass = GetPlayerInfoByGUID(guid)
-		if englishClass == "DEATHKNIGHT" then
-			filterTable[player] = 58
-		else
-			filterTable[player] = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
-		end
+	if not filterTable[player] or filterTable[player] ~= level then
+		filterTable[player] = level
 		AddFriend(player, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 	end
 	return true --filter everything not good (maybe) and not GM
