@@ -69,6 +69,7 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 			else
 				if maybe[player] then --do we need to process this person?
 					RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
+					if type(level) ~= "number" then print("Level wasn't a number, tell BadBoy author! It was:", level) end
 					if level < filterTable[player] then
 						--lower than level 2, or a level defined by the user = bad,
 						--or lower than 58 and class is a Death Knight,
