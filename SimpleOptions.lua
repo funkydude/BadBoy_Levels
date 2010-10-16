@@ -1,7 +1,7 @@
 
 do
 	local levelsBox = CreateFrame("EditBox", "BadBoyLevelsEditBox", BadBoyConfig, "InputBoxTemplate")
-	levelsBox:SetPoint("TOPLEFT", BadBoyConfigNoArtButton, "BOTTOMLEFT", 10, -25)
+	levelsBox:SetPoint("TOPLEFT", BadBoyConfigPopupButton, "BOTTOMLEFT", 10, -25)
 	levelsBox:SetAutoFocus(false)
 	levelsBox:SetNumeric(true)
 	levelsBox:EnableMouse(true)
