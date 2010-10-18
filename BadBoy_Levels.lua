@@ -127,6 +127,19 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local flag = select(8, ...)
 	if flag == "GM" then return end
 
+	--RealID support, don't scan people that whisper us via their character instead of RealID
+	--that aren't on our friends list, but are on our RealID list.
+	for i=1, select(2, BNGetNumFriends()) do
+		local toon = BNGetNumFriendToons(i)
+		for j=1, toon do
+			local _, rName, rGame, rServer = BNGetFriendToonInfo(i, j)
+			if rName == player and rGame == "WoW" and rServer == GetRealmName() then
+				good[player] = true
+				return
+			end
+		end
+	end
+
 	if not maybe[player] then maybe[player] = {} end --added to maybe
 	local f = ...
 	f = f:GetName()
