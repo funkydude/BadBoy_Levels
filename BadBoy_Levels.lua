@@ -35,20 +35,15 @@ end)
 
 badboy:RegisterEvent("PLAYER_LOGIN")
 badboy:RegisterEvent("FRIENDLIST_UPDATE")
-badboy:RegisterEvent("GUILD_ROSTER_UPDATE")
-badboy:SetScript("OnEvent", function(_, evt, update)
+badboy:SetScript("OnEvent", function(_, evt)
 	if evt == "PLAYER_LOGIN" then
-		--update our safe list on login with guild/friends
-		if IsInGuild() then
-			GuildRoster()
-		end
-		ShowFriends()
-		good[UnitName("player")] = true --add ourself
+		ShowFriends() --force a friends list update on login
+		good[UnitName("player")] = true --add ourself to safe list
 		--variable health check
 		if BADBOY_LEVEL and type(BADBOY_LEVEL) ~= "number" then BADBOY_LEVEL = nil end
 		if BADBOY_LEVEL and BADBOY_LEVEL < 1 then BADBOY_LEVEL = nil end
 		BadBoyLevelsEditBox:SetText(BADBOY_LEVEL or 1)
-	elseif evt == "FRIENDLIST_UPDATE" then
+	else
 		if not login then --run on login only
 			login = true
 			local num = GetNumFriends()
@@ -103,25 +98,13 @@ badboy:SetScript("OnEvent", function(_, evt, update)
 				end
 			end
 		end
-	else
-		--back down if not in a guild
-		if not IsInGuild() then return end
-		--when people join/leave the guild, the roster doesn't update, but we're told it needs updated
-		--so just force an update when we're told, we don't update the good list until the roster is updated
-		if update then GuildRoster() return end
-		--get all online and offline guild members
-		local num = GetNumGuildMembers(true)
-		for i = 1, num do
-			local n = GetGuildRosterInfo(i)
-			--add guild member to good list
-			if n then good[n] = true end
-		end
 	end
 end)
 
 --incoming whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
-	--don't filter if good, GM, or x-server
+	--don't filter if good, GM, guild member, or x-server
+	if UnitIsInMyGuild(player) then return end
 	local player = select(4, ...)
 	if good[player] or player:find("%-") then return end
 	local flag = select(8, ...)
