@@ -104,9 +104,8 @@ end)
 --incoming whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--don't filter if good, GM, guild member, or x-server
-	if UnitIsInMyGuild(player) then return end
 	local player = select(4, ...)
-	if good[player] or player:find("%-") then return end
+	if UnitIsInMyGuild(player) or good[player] or player:find("%-") then return end
 	local flag = select(8, ...)
 	if flag == "GM" then return end
 
