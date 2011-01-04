@@ -17,6 +17,12 @@ do
 		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
 	elseif L == "ruRU" then
 		whisp = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, что бы шептать мне."
+	elseif L == "zhTW" then
+		whisp = "BadBoy_Levels: 你起碼要達到 %d 級才能密我。"
+		err = "你的好友列表滿了，此插件需要你騰出2個好友空位!"
+	elseif L == "zhCN" then
+		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能和我讲话"
+		err = "你的好友列表满了，此插件模块需要你腾出2个好友空位!"
 	end
 end
 
