@@ -1,5 +1,5 @@
-## Interface: 40100
-## Version: 2.77
+## Interface: 40200
+## Version: 2.78
 ## Title: BadBoy_Levels
 ## Notes: Filter whispers by level, minimally.
 ## Notes-deDE: Filtert Flüsternachrichten nach Level, minimalistisch.
