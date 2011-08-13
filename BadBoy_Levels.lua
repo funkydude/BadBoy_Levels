@@ -146,7 +146,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local guid = select(14, ...)
 	local _, englishClass = GetPlayerInfoByGUID(guid)
 	local level = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
-	if englishClass == "DEATHKNIGHT" then level = 58 end
+	if englishClass == "DEATHKNIGHT" and level < 58 then level = 58 end
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
 	if not filterTable[player] or filterTable[player] ~= level then
 		filterTable[player] = level
