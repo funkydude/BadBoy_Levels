@@ -9,6 +9,9 @@ do
 	if L == "esES" or L == "esMX" then
 		whisp = "BadBoy_Levels: Necesitas ser nivel %d para susurrarme."
 		err = "Has llegado a la cantidad máxima de amigos, quita 2 amigos para que este addon funcione propiamente."
+	elseif L == "ptBR" then
+		whisp = "BadBoy_Levels: Você precisa ter nível %d para me sussurrar."
+		err = "Você atingiu o numero máximo de amigos, remova 2 para este addon funcionar corretamente!"
 	elseif L == "deDE" then
 		whisp = "BadBoy_Levels: Du musst Level %d sein, um mir etwas flüstern zu können."
 		err = "Du hast die maximale Anzahl an Freunden erreicht, bitte entferne 2, damit dieses Addon richtig funktioniert!"
@@ -17,6 +20,10 @@ do
 		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
 	elseif L == "ruRU" then
 		whisp = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, что бы шептать мне."
+		err = "Вы достигли максимального количества друзей, удалите двоих для нормальной работы аддона!"
+	elseif L == "koKR" then
+		whisp = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
+		err = "친구 목록이 최대한도에 도달했습니다. 제대로 애드온이 작업을 하기 위해서는 2명을 제거해야 합니다!"
 	elseif L == "zhTW" then
 		whisp = "BadBoy_Levels: 你起碼要達到 %d 級才能密我。"
 		err = "你的好友列表滿了，此插件需要你騰出2個好友空位!"
@@ -70,7 +77,7 @@ badboy:SetScript("OnEvent", function(_, evt)
 			else
 				if maybe[player] then --do we need to process this person?
 					RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
-					if type(level) ~= "number" then print("Level wasn't a number, tell BadBoy author! It was:", level) end
+					if type(level) ~= "number" then print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level) end
 					if level < filterTable[player] then
 						--lower than level 2, or a level defined by the user = bad,
 						--or lower than 58 and class is a Death Knight,

@@ -1,5 +1,5 @@
 ## Interface: 40300
-## Version: 2.81
+## Version: 2.85
 ## Title: BadBoy_Levels
 ## Notes: Filter whispers by level, minimally.
 ## Notes-deDE: Filtert Flüsternachrichten nach Level, minimalistisch.
@@ -8,7 +8,9 @@
 ## Notes-esMX: Filtrar susurras por nivel mínimo.
 ## Notes-esES: Filtrar susurras por nivel mínimo.
 ## Notes-zhTW: 按照最低等級過濾悄悄話。
-## Notes-zhCN: 按照最低等級過濾悄悄話。
+## Notes-zhCN: 按照最低等级过滤密语。
+## Notes-koKR: 귓속말을 필터하기 위한 최소 레벨
+## Notes-ptBR: Filtra sussurros por nível, minimamente.
 ## Author: Funkydude
 ## SavedVariables: BADBOY_LEVEL
 ## Dependencies: BadBoy
