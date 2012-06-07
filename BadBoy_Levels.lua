@@ -77,7 +77,10 @@ badboy:SetScript("OnEvent", function(_, evt)
 			else
 				if maybe[player] then --do we need to process this person?
 					RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
-					if type(level) ~= "number" then print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level) end
+					if type(level) ~= "number" then
+						print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level)
+						error("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was: ".. tostring(level))
+					end
 					if level < filterTable[player] then
 						--lower than level 2, or a level defined by the user = bad,
 						--or lower than 58 and class is a Death Knight,
@@ -99,7 +102,13 @@ badboy:SetScript("OnEvent", function(_, evt)
 								if IsAddOnLoaded("WIM") then --WIM compat
 									WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(unpack(p))
 								else
-									ChatFrame_MessageEventHandler(unpack(p))
+									local checkFrame = unpack(p)
+									if checkFrame.AddMessage then
+										ChatFrame_MessageEventHandler(unpack(p))
+									else
+										print("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, no AddMessage detected for frame:", checkFrame:GetName())
+										error("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, no AddMessage detected for frame: ".. checkFrame:GetName())
+									end
 								end
 								wipe(p) --remove player data table
 							end
