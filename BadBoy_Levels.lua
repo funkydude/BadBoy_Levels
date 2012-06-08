@@ -100,7 +100,10 @@ badboy:SetScript("OnEvent", function(_, evt)
 							for _, p in pairs(v) do
 								--this player is good, we must restore the whisper(s) back to chat
 								if IsAddOnLoaded("WIM") then --WIM compat
-									WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(unpack(p))
+									WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(select(3, unpack(p)))
+								elseif IsAddOnLoaded("Cellular") then --Cellular compat
+									local _,_,a1,a2,_,_,_,a6,_,_,_,_,a11,a12 = unpack(p)
+									Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
 								else
 									local checkFrame = unpack(p)
 									if checkFrame.AddMessage then
@@ -129,7 +132,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local player = select(4, ...)
 	if UnitIsInMyGuild(player) or good[player] or player:find("%-") then return end
 	local flag = select(8, ...)
-	if flag == "GM" then return end
+	if flag == "GM" or flag == "DEV" then return end
 
 	--RealID support, don't scan people that whisper us via their character instead of RealID
 	--that aren't on our friends list, but are on our RealID list.
@@ -148,15 +151,15 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local f = ...
 	f = f:GetName()
 	if IsAddOnLoaded("WIM") and not f:find("WIM") then return true end --WIM compat
+	if IsAddOnLoaded("Cellular") and f ~= "Cellular" then return true end --Cellular compat
 	--one table per chatframe, incase we got whispers on 2+ chatframes
 	if not maybe[player][f] then maybe[player][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
 	local id = select(13, ...)
 	maybe[player][f][id] = {}
-	local n = IsAddOnLoaded("WIM") and 2 or 0 --WIM compat
 	for i = 1, select("#", ...) do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
-		maybe[player][f][id][i] = select(i+n, ...)
+		maybe[player][f][id][i] = select(i, ...)
 	end
 	--Decide the level to be filtered
 	local guid = select(14, ...)
