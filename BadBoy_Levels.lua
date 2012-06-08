@@ -105,13 +105,7 @@ badboy:SetScript("OnEvent", function(_, evt)
 									local _,_,a1,a2,_,_,_,a6,_,_,_,_,a11,a12 = unpack(p)
 									Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
 								else
-									local checkFrame = unpack(p)
-									if checkFrame.AddMessage then
-										ChatFrame_MessageEventHandler(unpack(p))
-									else
-										print("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, no AddMessage detected for frame:", checkFrame:GetName())
-										error("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, no AddMessage detected for frame: ".. checkFrame:GetName())
-									end
+									ChatFrame_MessageEventHandler(unpack(p))
 								end
 								wipe(p) --remove player data table
 							end
@@ -147,22 +141,26 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		end
 	end
 
-	if not maybe[player] then maybe[player] = {} end --added to maybe
 	local f = ...
 	f = f:GetName()
-	if IsAddOnLoaded("WIM") and not f:find("WIM") then return true end --WIM compat
+	if not f:find("^ChatFrame%d+$") and f ~= "WIM_workerFrame" and f ~= "Cellular" then
+		print("|cFF33FF99BadBoy_Levels|r: ERROR, tell BadBoy author, new frame found:", f)
+		error("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, new frame found: ".. f)
+		return
+	end
+	if IsAddOnLoaded("WIM") and f ~= "WIM_workerFrame" then return true end --WIM compat
 	if IsAddOnLoaded("Cellular") and f ~= "Cellular" then return true end --Cellular compat
+	if not maybe[player] then maybe[player] = {} end --added to maybe
 	--one table per chatframe, incase we got whispers on 2+ chatframes
 	if not maybe[player][f] then maybe[player][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
-	local id = select(13, ...)
+	local id, guid = select(13, ...)
 	maybe[player][f][id] = {}
 	for i = 1, select("#", ...) do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
 		maybe[player][f][id][i] = select(i, ...)
 	end
 	--Decide the level to be filtered
-	local guid = select(14, ...)
 	local _, englishClass = GetPlayerInfoByGUID(guid)
 	local level = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
 	if englishClass == "DEATHKNIGHT" and level < 58 then level = 58 end
