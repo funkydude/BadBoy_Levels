@@ -30,6 +30,9 @@ do
 	elseif L == "zhCN" then
 		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能和我讲话"
 		err = "你的好友列表满了，此插件模块需要你腾出2个好友空位!"
+	elseif L == "itIT" then
+		whisp = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
+		err = "Hai raggiunto il limite massimo di amici, rimuovine 2 per permettere a questo addon di funzionare correttamente!"
 	end
 end
 
