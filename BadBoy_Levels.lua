@@ -1,6 +1,6 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy, filterTable, login = {}, {}, CreateFrame("Frame", "BadBoy_Levels"), {}, nil
+local good, maybe, badboy, filterTable, login = {}, {}, CreateFrame("Frame"), {}, nil
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
@@ -43,7 +43,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
 	end
 	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
 	for k in pairs(filterTable) do
-		if msg == (ERR_FRIEND_ADDED_S):format(k) or msg == (ERR_FRIEND_REMOVED_S):format(k) then
+		if msg == ERR_FRIEND_ADDED_S:format(k) or msg == ERR_FRIEND_REMOVED_S:format(k) then
 			return true
 		end
 	end
@@ -55,10 +55,9 @@ badboy:SetScript("OnEvent", function(_, evt)
 	if evt == "PLAYER_LOGIN" then
 		ShowFriends() --force a friends list update on login
 		good[UnitName("player")] = true --add ourself to safe list
-		--variable health check
-		if BADBOY_LEVEL and type(BADBOY_LEVEL) ~= "number" then BADBOY_LEVEL = nil end
-		if BADBOY_LEVEL and BADBOY_LEVEL < 1 then BADBOY_LEVEL = nil end
-		BadBoyLevelsEditBox:SetText(BADBOY_LEVEL or 1)
+		if type(BADBOY_LEVEL) ~= "number" or BADBOY_LEVEL < 1 then
+			BADBOY_LEVEL = nil
+		end
 	else
 		if not login then --run on login only
 			login = true
