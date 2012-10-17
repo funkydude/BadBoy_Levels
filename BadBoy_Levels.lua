@@ -1,6 +1,8 @@
 
 --good players(guildies/friends), maybe(for processing)
-local good, maybe, badboy, filterTable, login = {}, {}, CreateFrame("Frame"), {}, nil
+local badboy = CreateFrame("Frame")
+local good, maybe, filterTable = {}, {}, {}
+local login = nil
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
@@ -36,27 +38,41 @@ do
 	end
 end
 
-ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_,_,msg)
-	if msg == ERR_FRIEND_LIST_FULL then
-		print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
-		return
-	end
-	--this is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
-	for k in pairs(filterTable) do
-		if msg == ERR_FRIEND_ADDED_S:format(k) or msg == ERR_FRIEND_REMOVED_S:format(k) then
-			return true
+local addMsg, hookFunc
+do
+	-- For some reason any form of CHAT_MSG_SYSTEM filter causes nonsense world map taints, so use the next best thing
+	local addFrnd = ERR_FRIEND_ADDED_S:gsub("%%s", "([^ ]+)")
+	local rmvFrnd = ERR_FRIEND_REMOVED_S:gsub("%%s", "([^ ]+)")
+	local info = ChatTypeInfo.SYSTEM
+	hookFunc = function(f, msg, r, g, b, ...)
+		-- This is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
+		if r == info.r and g == info.g and b == info.b then
+			local _, _, player = msg:find(addFrnd)
+			if not player then
+				_, _, player = msg:find(rmvFrnd)
+			end
+			if player and filterTable[player] then
+				return
+			end
 		end
+		return addMsg(f, msg, r, g, b, ...)
 	end
-end)
+end
 
 badboy:RegisterEvent("PLAYER_LOGIN")
 badboy:RegisterEvent("FRIENDLIST_UPDATE")
-badboy:SetScript("OnEvent", function(_, evt)
+badboy:RegisterEvent("CHAT_MSG_SYSTEM")
+badboy:SetScript("OnEvent", function(_, evt, msg)
 	if evt == "PLAYER_LOGIN" then
 		ShowFriends() --force a friends list update on login
 		good[UnitName("player")] = true --add ourself to safe list
 		if type(BADBOY_LEVEL) ~= "number" or BADBOY_LEVEL < 1 then
 			BADBOY_LEVEL = nil
+		end
+	elseif evt == "CHAT_MSG_SYSTEM" then
+		if msg == ERR_FRIEND_LIST_FULL then
+			print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
+			return
 		end
 	else
 		if not login then --run on login only
@@ -124,15 +140,15 @@ end)
 
 --incoming whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
+	local f, _, _, player, _, _, _, flag, _, _, _, _, id, guid = ...
 	--don't filter if good, GM, guild member, or x-server
-	local player = select(4, ...)
-	if UnitIsInMyGuild(player) or good[player] or player:find("%-") then return end
-	local flag = select(8, ...)
+	if good[player] or player:find("%-") or UnitIsInMyGuild(player) then return end
 	if flag == "GM" or flag == "DEV" then return end
 
 	--RealID support, don't scan people that whisper us via their character instead of RealID
 	--that aren't on our friends list, but are on our RealID list.
-	for i=1, select(2, BNGetNumFriends()) do
+	local _, num = BNGetNumFriends()
+	for i=1, num do
 		local toon = BNGetNumFriendToons(i)
 		for j=1, toon do
 			local _, rName, rGame, rServer = BNGetFriendToonInfo(i, j)
@@ -143,7 +159,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		end
 	end
 
-	local f = ...
+	if not addMsg then -- On-demand hook for chat filtering
+		addMsg = ChatFrame1.AddMessage
+		ChatFrame1.AddMessage = hookFunc
+	end
+
 	f = f:GetName()
 	if not f:find("^ChatFrame%d+$") and f ~= "WIM_workerFrame" and f ~= "Cellular" then
 		print("|cFF33FF99BadBoy_Levels|r: ERROR, tell BadBoy author, new frame found:", f)
@@ -156,7 +176,6 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--one table per chatframe, incase we got whispers on 2+ chatframes
 	if not maybe[player][f] then maybe[player][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
-	local id, guid = select(13, ...)
 	maybe[player][f][id] = {}
 	for i = 1, select("#", ...) do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
