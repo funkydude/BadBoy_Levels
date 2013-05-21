@@ -165,6 +165,8 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	end
 
 	f = f:GetName()
+	if not f then f = "?" end
+	if f == "WIM3_HistoryChatFrame" then return end -- Ignore WIM history frame
 	if not f:find("^ChatFrame%d+$") and f ~= "WIM_workerFrame" and f ~= "Cellular" then
 		print("|cFF33FF99BadBoy_Levels|r: ERROR, tell BadBoy author, new frame found:", f)
 		error("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, new frame found: ".. f)
