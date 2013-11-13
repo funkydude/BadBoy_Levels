@@ -1,9 +1,8 @@
 
-local levelsBox = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
+local levelsBox = CreateFrame("EditBox", "BadBoyLevelsInputBox", BadBoyConfig, "InputBoxTemplate")
 levelsBox:SetPoint("TOPLEFT", BadBoyConfigPopupButton, "BOTTOMLEFT", 10, -25)
 levelsBox:SetAutoFocus(false)
 levelsBox:SetNumeric(true)
-levelsBox:EnableMouse(true)
 levelsBox:SetWidth(30)
 levelsBox:SetHeight(20)
 levelsBox:SetMaxLetters(2)
@@ -24,7 +23,7 @@ levelsBox:SetScript("OnShow", function(frame)
 	frame:SetText(BADBOY_LEVEL or 1)
 end)
 
-local note = "Note: Death Knights lower than level 58 are blocked"
+local note = "Note: Death Knights lower than level 58 are blocked."
 do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
@@ -42,7 +41,7 @@ do
 	elseif L == "zhTW" then
 
 	elseif L == "zhCN" then
-
+		note = "备注：低于58级的死亡骑士会被屏蔽。"
 	elseif L == "itIT" then
 
 	end
