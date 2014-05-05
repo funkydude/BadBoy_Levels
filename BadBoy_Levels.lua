@@ -141,8 +141,9 @@ end)
 --incoming whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local f, _, _, player, _, _, _, flag, _, _, _, _, id, guid = ...
+	local trimmedPlayer = Ambiguate(player, "none")
 	--don't filter if good, GM, guild member, or x-server
-	if good[player] or player:find("%-") or UnitIsInMyGuild(player) then return end
+	if good[trimmedPlayer] or trimmedPlayer:find("%-") or UnitIsInMyGuild(trimmedPlayer) then return end
 	if flag == "GM" or flag == "DEV" then return end
 
 	--RealID support, don't scan people that whisper us via their character instead of RealID
@@ -152,8 +153,8 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		local toon = BNGetNumFriendToons(i)
 		for j=1, toon do
 			local _, rName, rGame, rServer = BNGetFriendToonInfo(i, j)
-			if rName == player and rGame == "WoW" and rServer == GetRealmName() then
-				good[player] = true
+			if rName == trimmedPlayer and rGame == "WoW" and rServer == GetRealmName() then
+				good[trimmedPlayer] = true
 				return
 			end
 		end
@@ -174,31 +175,32 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	end
 	if IsAddOnLoaded("WIM") and f ~= "WIM_workerFrame" then return true end --WIM compat
 	if IsAddOnLoaded("Cellular") and f ~= "Cellular" then return true end --Cellular compat
-	if not maybe[player] then maybe[player] = {} end --added to maybe
+	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
 	--one table per chatframe, incase we got whispers on 2+ chatframes
-	if not maybe[player][f] then maybe[player][f] = {} end
+	if not maybe[trimmedPlayer][f] then maybe[trimmedPlayer][f] = {} end
 	--one table per id, incase we got more than one whisper from a player whilst still processing
-	maybe[player][f][id] = {}
+	maybe[trimmedPlayer][f][id] = {}
 	for i = 1, select("#", ...) do
 		--store all the chat arguments incase we need to add it back (if it's a new good guy)
-		maybe[player][f][id][i] = select(i, ...)
+		maybe[trimmedPlayer][f][id][i] = select(i, ...)
 	end
 	--Decide the level to be filtered
 	local _, englishClass = GetPlayerInfoByGUID(guid)
 	local level = BADBOY_LEVEL and tonumber(BADBOY_LEVEL)+1 or 2
 	if englishClass == "DEATHKNIGHT" and level < 58 then level = 58 end
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
-	if not filterTable[player] or filterTable[player] ~= level then
-		filterTable[player] = level
-		AddFriend(player, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
+	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
+		filterTable[trimmedPlayer] = level
+		AddFriend(trimmedPlayer, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
 	end
 	return true --filter everything not good (maybe) and not GM
 end)
 
 --outgoing whisper filtering function
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
-	if good[player] then return end --Do nothing if on safe list
-	if filterTable[player] and msg:find("^BadBoy.*"..filterTable[player]) then return true end --Filter auto-response
-	good[player] = true --If we want to whisper someone, they're good
+	local trimmedPlayer = Ambiguate(player, "none")
+	if good[trimmedPlayer] then return end --Do nothing if on safe list
+	if filterTable[trimmedPlayer] and msg:find("^BadBoy.*"..filterTable[trimmedPlayer]) then return true end --Filter auto-response
+	good[trimmedPlayer] = true --If we want to whisper someone, they're good
 end)
 
