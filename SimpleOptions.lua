@@ -5,7 +5,7 @@ levelsBox:SetAutoFocus(false)
 levelsBox:SetNumeric(true)
 levelsBox:SetWidth(30)
 levelsBox:SetHeight(20)
-levelsBox:SetMaxLetters(2)
+levelsBox:SetMaxLetters(3)
 levelsBox:Show()
 
 levelsBox:SetScript("OnHide", function(frame)
