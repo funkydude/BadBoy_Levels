@@ -35,7 +35,7 @@ do
 	elseif L == "frFR" then
 
 	elseif L == "ruRU" then
-
+		note = "Примечание: блокируются рыцари смерти, уровень которых ниже 58"
 	elseif L == "koKR" then
 
 	elseif L == "zhTW" then

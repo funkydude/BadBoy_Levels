@@ -22,7 +22,7 @@ do
 		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
 	elseif L == "ruRU" then
 		whisp = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, что бы шептать мне."
-		err = "Вы достигли максимального количества друзей, удалите двоих для нормальной работы аддона!"
+		err = "Вы достигли максимального количества друзей, удалите двоих для нормальной работы модификации!"
 	elseif L == "koKR" then
 		whisp = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
 		err = "친구 목록이 최대한도에 도달했습니다. 제대로 애드온이 작업을 하기 위해서는 2명을 제거해야 합니다!"
@@ -31,7 +31,7 @@ do
 		err = "你的好友列表滿了，此插件需要你騰出2個好友空位!"
 	elseif L == "zhCN" then
 		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能和我讲话。"
-		err = "你的好友列表满了，此插件模块需要你腾出2个好友空位！"
+		err = "你的好友列表已满，此模块需要你腾出2个好友空位！"
 	elseif L == "itIT" then
 		whisp = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
 		err = "Hai raggiunto il limite massimo di amici, rimuovine 2 per permettere a questo addon di funzionare correttamente!"
