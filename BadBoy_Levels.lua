@@ -6,6 +6,10 @@ local login = nil
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
+-- XXX temp for patch 6.2.4
+local BNGetNumFriendGameAccounts = BNGetNumFriendToons or BNGetNumFriendGameAccounts
+local BNGetFriendGameAccountInfo = BNGetFriendToonInfo or BNGetFriendGameAccountInfo
+
 do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
@@ -150,9 +154,9 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--that aren't on our friends list, but are on our RealID list.
 	local _, num = BNGetNumFriends()
 	for i=1, num do
-		local toon = BNGetNumFriendToons(i)
-		for j=1, toon do
-			local _, rName, rGame, rServer = BNGetFriendToonInfo(i, j)
+		local gameAccs = BNGetNumFriendGameAccounts(i)
+		for j=1, gameAccs do
+			local _, rName, rGame, rServer = BNGetFriendGameAccountInfo(i, j)
 			if rName == trimmedPlayer and rGame == "WoW" and rServer == GetRealmName() then
 				good[trimmedPlayer] = true
 				return
