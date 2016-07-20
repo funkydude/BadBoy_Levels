@@ -6,10 +6,6 @@ local login = nil
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 
--- XXX temp for patch 6.2.4
-local BNGetNumFriendGameAccounts = BNGetNumFriendToons or BNGetNumFriendGameAccounts
-local BNGetFriendGameAccountInfo = BNGetFriendToonInfo or BNGetFriendGameAccountInfo
-
 do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
