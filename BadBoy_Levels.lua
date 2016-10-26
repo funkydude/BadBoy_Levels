@@ -144,8 +144,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local trimmedPlayer = Ambiguate(player, "none")
 	--don't filter if good, GM, guild member, or x-server
 	if good[trimmedPlayer] or trimmedPlayer:find("%-") then return end
-	local _, _, relationship = SocialQueueUtil_GetNameAndColor(guid)
-	if not CanComplainChat(lineId) or UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer) or relationship or flag == "GM" or flag == "DEV" then return end
+	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
 	if not addMsg then -- On-demand hook for chat filtering
 		addMsg = ChatFrame1.AddMessage
