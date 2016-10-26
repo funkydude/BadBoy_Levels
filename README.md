@@ -3,7 +3,7 @@
 ## Features
 * Hides whispers from players below a specific level.
 
-## Only certain people are allowed to whisper you:
+## Only certain people are allowed to whisper you
 * People on your friends list.
 * People that are part of your guild.
 * People above the level you choose.
