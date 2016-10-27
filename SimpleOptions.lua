@@ -1,6 +1,6 @@
 
-local levelsBox = CreateFrame("EditBox", "BadBoyLevelsInputBox", BadBoyConfig, "InputBoxTemplate")
-levelsBox:SetPoint("TOPLEFT", BadBoyConfigPopupButton, "BOTTOMLEFT", 10, -25)
+local levelsBox = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
+levelsBox:SetPoint("TOPLEFT", BadBoyLevelsConfigTitle, "BOTTOMLEFT", 5, 0)
 levelsBox:SetAutoFocus(false)
 levelsBox:SetNumeric(true)
 levelsBox:SetWidth(30)
@@ -47,10 +47,10 @@ do
 	end
 end
 
-local dkText = levelsBox:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-dkText:SetPoint("LEFT", levelsBox, "RIGHT", 40, 1)
+local dkText = levelsBox:CreateFontString(nil, nil, "GameFontHighlight")
+dkText:SetPoint("LEFT", levelsBox, "RIGHT", 10, 0)
 dkText:SetText(note)
 dkText:SetTextColor(0.5, 0.5, 0.5)
 
-BadBoyLevelsConfigTitle:SetText("BadBoy_Levels @project-version@") --wowace magic, replaced with tag version
+BadBoyLevelsConfigTitle:SetText("BadBoy_Levels @project-version@") -- Packager magic, replaced with tag version
 
