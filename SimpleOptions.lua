@@ -29,13 +29,13 @@ do
 	if L == "esES" or L == "esMX" then
 
 	elseif L == "ptBR" then
-
+		note = "Nota: Cavaleiros da Morte com nível menor que 58 serão bloqueados."
 	elseif L == "deDE" then
-
+		note = "Hinweis: Todesritter unter Stufe 58 werden blockiert."
 	elseif L == "frFR" then
 
 	elseif L == "ruRU" then
-		note = "Примечание: блокируются рыцари смерти, уровень которых ниже 58"
+		note = "Примечание: блокируются рыцари смерти, уровень которых ниже 58."
 	elseif L == "koKR" then
 
 	elseif L == "zhTW" then

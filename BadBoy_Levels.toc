@@ -4,7 +4,7 @@
 ## Notes: Filter whispers by level, minimally.
 ## Notes-frFR: Filtre les chuchotements par niveau, au minimum.
 ## Notes-deDE: Filtert Flüsternachrichten nach Level, minimalistisch.
-## Notes-ptBR: Filtra sussurros por nível, minimamente.
+## Notes-ptBR: Filtra sussurros por nível, no mínimo.
 ## Notes-ruRU: Фильтрация сообщений по уровню, минимальная.
 ## Notes-zhTW: 按照最低等級過濾悄悄話。
 ## Notes-zhCN: 按照最低等级过滤密语。
