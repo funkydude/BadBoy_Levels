@@ -13,7 +13,7 @@
 ## Notes-esES: Filtrar susurras por nivel mínimo.
 ## Notes-itIT: Filtra i sussurri per livello.
 ## Author: Funkydude
-## SavedVariables: BADBOY_LEVEL
+## SavedVariables: BADBOY_LEVELS
 ## Dependencies: BadBoy
 ## OptionalDeps: BadBoy_Guilded
 ## X-Credits: Mikk
