@@ -1,7 +1,7 @@
 
 --good players(guildies/friends), maybe(for processing)
 local badboy = CreateFrame("Frame")
-local good, maybe, filterTable = {}, {}, {}
+local good, maybe, filterTable, whispered = {}, {}, {}, {}
 local login = false
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
@@ -121,7 +121,11 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 						end
 						if level < filterTable[player] then
 							--Whisper the bad player what level they must be to whisper us
-							SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
+							if not whispered[player] then
+								whispered[player] = true
+								SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
+								C_Timer.After(60, function() whispered[player] = nil end)
+							end
 							for _, v in pairs(maybe[player]) do
 								for _, p in pairs(v) do
 									wipe(p) --remove player data table
@@ -182,7 +186,11 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		end
 
 		if not allow then
-			SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
+			if not whispered[trimmedPlayer] then
+				whispered[trimmedPlayer] = true
+				SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
+				C_Timer.After(60, function() whispered[trimmedPlayer] = nil end)
+			end
 			return true
 		else
 			return
