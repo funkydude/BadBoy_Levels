@@ -77,7 +77,7 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 
 	good[UnitName("player")] = true --add ourself to safe list
 	if type(BADBOY_LEVELS) ~= "table" then
-		BADBOY_LEVELS = {level = 2, dklevel = 58, dhlevel = 100, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
+		BADBOY_LEVELS = {level = 3, dklevel = 58, dhlevel = 100, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
 		-- XXX TEMPORARY
 		local msg = "BadBoy_Levels: Your settings have been reset and expanded."
 		local locale = GetLocale()
