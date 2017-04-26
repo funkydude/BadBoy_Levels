@@ -71,7 +71,10 @@ end
 
 badboy:RegisterEvent("PLAYER_LOGIN")
 badboy:SetScript("OnEvent", function(frame, evt, msg)
-	ShowFriends() --force a friends list update on login
+	frame:UnregisterEvent("PLAYER_LOGIN")
+	frame:RegisterEvent("FRIENDLIST_UPDATE")
+	frame:RegisterEvent("CHAT_MSG_SYSTEM")
+
 	good[UnitName("player")] = true --add ourself to safe list
 	if type(BADBOY_LEVELS) ~= "table" then
 		BADBOY_LEVELS = {level = 2, dklevel = 58, dhlevel = 101, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
@@ -84,9 +87,6 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 		message(msg)
 		-- XXX
 	end
-	frame:UnregisterEvent("PLAYER_LOGIN")
-	frame:RegisterEvent("FRIENDLIST_UPDATE")
-	frame:RegisterEvent("CHAT_MSG_SYSTEM")
 
 	frame:SetScript("OnEvent", function(frame, evt, msg)
 		if evt == "CHAT_MSG_SYSTEM" then
@@ -155,6 +155,8 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 			end
 		end
 	end)
+
+	ShowFriends() --force a friends list update on login
 end)
 
 --incoming whisper filtering function
