@@ -167,9 +167,10 @@ end)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	local f, _, _, player, _, _, _, flag, _, _, _, _, id, guid = ...
 	local trimmedPlayer = Ambiguate(player, "none")
+	if good[trimmedPlayer] or flag == "GM" or flag == "DEV" then return end -- don't filter if good or GM
 
 	--[[ Start functionality for blocking all whispers regardless of level ]]--
-	if BADBOY_LEVELS.blockall and flag ~= "GM" and flag ~= "DEV" then
+	if BADBOY_LEVELS.blockall then
 		local allow = false
 
 		if BADBOY_LEVELS.allowfriends then
@@ -198,8 +199,8 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	end
 	--[[ End functionality for blocking all whispers regardless of level ]]--
 
-	--don't filter if good, GM, guild member, or x-server
-	if good[trimmedPlayer] or trimmedPlayer:find("%-") then return end
+	--don't filter if guild member, friend, in group, or x-server
+	if trimmedPlayer:find("-", nil, true) then return end
 	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
 	if not addMsg then -- On-demand hook for chat filtering
