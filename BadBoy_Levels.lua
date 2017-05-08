@@ -247,7 +247,7 @@ end)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
 	local trimmedPlayer = Ambiguate(player, "none")
 	if good[trimmedPlayer] then return end --Do nothing if on safe list
-	if filterTable[trimmedPlayer] and msg:find("^BadBoy.*"..filterTable[trimmedPlayer]) then return true end --Filter auto-response
+	if msg:find("^BadBoy_Levels: ") then return true end --Filter auto-response
 	good[trimmedPlayer] = true --If we want to whisper someone, they're good
 end)
 
