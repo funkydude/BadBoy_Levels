@@ -214,7 +214,11 @@ allowFriendsBtn:SetPoint("TOPLEFT", blockAllBtn, "BOTTOMLEFT", 30, 5)
 allowFriendsBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
 	BADBOY_LEVELS.allowfriends = tick
-	PlaySound(tick and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+	if tick then
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOn" or 856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+	else
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOff" or 857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+	end
 end)
 
 local allowFriendsBtnText = allowFriendsBtn:CreateFontString(nil, nil, "GameFontHighlight")
@@ -235,7 +239,11 @@ allowGuildBtn:SetPoint("LEFT", allowFriendsBtn, "RIGHT", 110, 0)
 allowGuildBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
 	BADBOY_LEVELS.allowguild = tick
-	PlaySound(tick and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+	if tick then
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOn" or 856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+	else
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOff" or 857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+	end
 end)
 
 local allowGuildBtnText = allowGuildBtn:CreateFontString(nil, nil, "GameFontHighlight")
@@ -256,7 +264,11 @@ allowGroupBtn:SetPoint("LEFT", allowGuildBtn, "RIGHT", 110, 0)
 allowGroupBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
 	BADBOY_LEVELS.allowgroup = tick
-	PlaySound(tick and "igMainMenuOptionCheckBoxOn" or "igMainMenuOptionCheckBoxOff")
+	if tick then
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOn" or 856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
+	else
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOff" or 857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
+	end
 end)
 
 local allowGroupBtnText = allowGroupBtn:CreateFontString(nil, nil, "GameFontHighlight")
@@ -293,7 +305,7 @@ blockAllBtn:SetScript("OnClick", function(frame)
 		allowGroupBtn:Enable()
 		allowGroupBtnText:SetTextColor(1, 1, 1)
 
-		PlaySound("igMainMenuOptionCheckBoxOn")
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOn" or 856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 	else
 		levelsBoxDH:Enable()
 		levelsBoxDH:SetTextColor(1, 1, 1)
@@ -318,7 +330,7 @@ blockAllBtn:SetScript("OnClick", function(frame)
 		allowGroupBtn:Disable()
 		allowGroupBtnText:SetTextColor(0.5, 0.5, 0.5)
 
-		PlaySound("igMainMenuOptionCheckBoxOff")
+		PlaySound(PlaySoundKitID and "igMainMenuOptionCheckBoxOff" or 857) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_OFF
 	end
 end)
 
