@@ -90,16 +90,20 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 			if not login then --run on login only
 				login = true
 				local num = C_FriendList.GetNumFriends()
-				for i = 1, num do
+				for i = num, 1, -1 do
 					local tbl = C_FriendList.GetFriendInfoByIndex(i)
 					--add friends to safe list
-					if tbl.name then good[tbl.name] = true end
+					if tbl.notes == "badboy_temp" then
+						C_FriendList.RemoveFriendByIndex(i)
+					elseif type(tbl.name) == "string" then
+						good[tbl.name] = true
+					end
 				end
 				return
 			end
 
 			local num = C_FriendList.GetNumFriends() --get total friends
-			for i = 1, num do
+			for i = num, 1, -1 do
 				local tbl = C_FriendList.GetFriendInfoByIndex(i)
 				local player, level = tbl.name, tbl.level
 				--sometimes a friend will return nil, I have no idea why, so force another update
@@ -107,7 +111,7 @@ badboy:SetScript("OnEvent", function(frame, evt, msg)
 					C_FriendList.ShowFriends()
 				else
 					if maybe[player] then --do we need to process this person?
-						C_FriendList.RemoveFriend(player, true) --Remove player from friends list, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
+						C_FriendList.RemoveFriendByIndex(i)
 						if type(level) ~= "number" then
 							print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level)
 							error("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was: ".. tostring(level))
@@ -231,7 +235,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
 	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
 		filterTable[trimmedPlayer] = level
-		C_FriendList.AddFriend(trimmedPlayer, true) --add player to friends, the 2nd arg "true" is a fake arg added by request of tekkub, author of FriendsWithBenefits
+		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
 	end
 	return true --filter everything not good (maybe) and not GM
 end)
