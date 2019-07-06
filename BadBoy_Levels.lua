@@ -1,11 +1,15 @@
 
 --good players(guildies/friends), maybe(for processing)
 local badboy = CreateFrame("Frame")
+local mod, idsToFilter = {}, {}
 local good, maybe, filterTable, whispered = {}, {}, {}, {}
-local login = false
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
+
+badboy:SetScript("OnEvent", function(frame, event, ...)
+	mod[event](mod, frame, event, ...)
+end)
 
 do
 	local L = GetLocale()
@@ -69,100 +73,112 @@ do
 	end
 end
 
-badboy:RegisterEvent("PLAYER_LOGIN")
-badboy:SetScript("OnEvent", function(frame, evt, msg)
-	frame:UnregisterEvent("PLAYER_LOGIN")
+function mod:PLAYER_LOGIN(frame, event)
+	frame:UnregisterEvent(event)
 	frame:RegisterEvent("FRIENDLIST_UPDATE")
 	frame:RegisterEvent("CHAT_MSG_SYSTEM")
+
+	local tbl = {
+		"CHAT_MSG_WHISPER",
+		"CHAT_MSG_WHISPER_INFORM",
+	}
+	for i = 1, #tbl do
+		local event = tbl[i]
+		local frames = {GetFramesRegisteredForEvent(event)}
+		for i = 1, #frames do
+			local f = frames[i]
+			f:UnregisterEvent(event)
+		end
+		frame:RegisterEvent(event)
+		for i = 1, #frames do
+			local f = frames[i]
+			f:RegisterEvent(event)
+		end
+	end
 
 	good[UnitName("player")] = true --add ourself to safe list
 	if type(BADBOY_LEVELS) ~= "table" then
 		BADBOY_LEVELS = {level = 3, dklevel = 58, dhlevel = 100, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
 	end
 
-	frame:SetScript("OnEvent", function(frame, evt, msg)
-		if evt == "CHAT_MSG_SYSTEM" then
-			if msg == ERR_FRIEND_LIST_FULL then
-				print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
-				return
-			end
-		else
-			if not login then --run on login only
-				login = true
-				local num = C_FriendList.GetNumFriends()
-				for i = num, 1, -1 do
-					local tbl = C_FriendList.GetFriendInfoByIndex(i)
-					--add friends to safe list
-					if tbl.notes == "badboy_temp" then
-						C_FriendList.RemoveFriendByIndex(i)
-					elseif type(tbl.name) == "string" then
-						good[tbl.name] = true
-					end
-				end
-				return
-			end
+	C_FriendList.ShowFriends() --force a friends list update on login
+end
+badboy:RegisterEvent("PLAYER_LOGIN")
 
-			local num = C_FriendList.GetNumFriends() --get total friends
-			for i = num, 1, -1 do
-				local tbl = C_FriendList.GetFriendInfoByIndex(i)
-				local player, level = tbl.name, tbl.level
-				--sometimes a friend will return nil, I have no idea why, so force another update
-				if not player then
-					C_FriendList.ShowFriends()
-				else
-					if maybe[player] then --do we need to process this person?
-						C_FriendList.RemoveFriendByIndex(i)
-						if type(level) ~= "number" then
-							print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level)
-							error("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was: ".. tostring(level))
-						end
-						if level < filterTable[player] then
-							--Whisper the bad player what level they must be to whisper us
-							if not whispered[player] then
-								whispered[player] = true
-								SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
-								C_Timer.After(60, function() whispered[player] = nil end)
-							end
-							for _, v in pairs(maybe[player]) do
-								for _, p in pairs(v) do
-									wipe(p) --remove player data table
-								end
-								wipe(v) --remove player data table
-							end
-						else
-							good[player] = true --higher = good
-							--get all the frames, incase whispers are being recieved in more that one chat frame
-							for _, v in pairs(maybe[player]) do
-								--get all the chat lines (queued if multiple) for restoration back to the chat frame
-								for _, p in pairs(v) do
-									--this player is good, we must restore the whisper(s) back to chat
-									if IsAddOnLoaded("WIM") then --WIM compat
-										WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(select(3, unpack(p)))
-									elseif IsAddOnLoaded("Cellular") then --Cellular compat
-										local _,_,a1,a2,_,_,_,a6,_,_,_,_,a11,a12 = unpack(p)
-										Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
-									else
-										ChatFrame_MessageEventHandler(unpack(p))
-									end
-									wipe(p) --remove player data table
-								end
-								wipe(v) --remove player data table
-							end
-						end
-						wipe(maybe[player]) --remove player data table
-						maybe[player] = nil --remove remaining empty table
+function mod:CHAT_MSG_SYSTEM(_, _, msg)
+	if msg == ERR_FRIEND_LIST_FULL then
+		print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
+	end
+end
+
+function mod:FRIENDLIST_UPDATE(_, _, msg)
+	-- first run only (player login)
+	local num = C_FriendList.GetNumFriends()
+	for i = num, 1, -1 do
+		local tbl = C_FriendList.GetFriendInfoByIndex(i)
+		--add friends to safe list
+		if tbl.notes == "badboy_temp" then
+			C_FriendList.RemoveFriendByIndex(i)
+		elseif type(tbl.name) == "string" then
+			good[tbl.name] = true
+		end
+	end
+	-- end first run (player login)
+
+	function mod:FRIENDLIST_UPDATE(_, _, msg)
+		local num = C_FriendList.GetNumFriends() --get total friends
+		for i = num, 1, -1 do
+			local tbl = C_FriendList.GetFriendInfoByIndex(i)
+			local player, level = tbl.name, tbl.level
+			--sometimes a friend will return nil, I have no idea why, so force another update
+			if not player then
+				C_FriendList.ShowFriends()
+			else
+				if maybe[player] then --do we need to process this person?
+					C_FriendList.RemoveFriendByIndex(i)
+					if type(level) ~= "number" then
+						print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level)
+						error("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was: ".. tostring(level))
 					end
+					if level < filterTable[player] then
+						--Whisper the bad player what level they must be to whisper us
+						if not whispered[player] then
+							whispered[player] = true
+							SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
+							C_Timer.After(60, function() whispered[player] = nil end)
+						end
+					else
+						good[player] = true --higher = good
+						for id, argsTable in next, maybe[player] do
+							--this player is good, we must restore the whisper(s) back to chat
+							idsToFilter[id] = nil
+							local argsCount = argsTable[1]
+							if IsAddOnLoaded("WIM") then --WIM compat
+								WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(unpack(argsTable, 2, argsCount+1))
+							elseif IsAddOnLoaded("Cellular") then --Cellular compat
+								local a1,a2,_,_,_,a6,_,_,_,_,a11,a12 = unpack(argsTable, 2, argsCount+1)
+								Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
+							else
+								local frames = {GetFramesRegisteredForEvent("CHAT_MSG_WHISPER")}
+								for i = 1, #frames do
+									local f = frames[i]
+									local name = f.GetName and f:GetName()
+									if type(name) == "string" and name:find("^ChatFrame") then
+										ChatFrame_MessageEventHandler(f, "CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
+									end
+								end
+							end
+						end
+					end
+					maybe[player] = nil --remove player entry
 				end
 			end
 		end
-	end)
+	end
+end
 
-	C_FriendList.ShowFriends() --force a friends list update on login
-end)
-
---incoming whisper filtering function
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
-	local f, _, _, player, _, _, _, flag, _, _, _, _, id, guid = ...
+function mod:CHAT_MSG_WHISPER(_, _, ...)
+	local _, player, _, _, _, flag, _, _, _, _, id, guid = ...
 	local trimmedPlayer = Ambiguate(player, "none")
 	if good[trimmedPlayer] or flag == "GM" or flag == "DEV" then return end -- don't filter if good or GM
 
@@ -189,7 +205,7 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 				SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
 				C_Timer.After(60, function() whispered[trimmedPlayer] = nil end)
 			end
-			return true
+			idsToFilter[id] = true
 		else
 			return
 		end
@@ -198,32 +214,17 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 
 	--don't filter if guild member, friend, in group, or x-server
 	if trimmedPlayer:find("-", nil, true) then return end
-	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
+	--if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
 	if not addMsg then -- On-demand hook for chat filtering
 		addMsg = ChatFrame1.AddMessage
 		ChatFrame1.AddMessage = hookFunc
 	end
 
-	f = f:GetName()
-	if not f then f = "?" end
-	if f == "WIM3_HistoryChatFrame" then return end -- Ignore WIM history frame
-	if not f:find("^ChatFrame%d+$") and f ~= "WIM_workerFrame" and f ~= "Cellular" then
-		print("|cFF33FF99BadBoy_Levels|r: ERROR, tell BadBoy author, new frame found:", f)
-		error("|cFF33FF99BadBoy_Levels|r: Tell BadBoy author, new frame found: ".. f)
-		return
-	end
-	if IsAddOnLoaded("WIM") and f ~= "WIM_workerFrame" then return true end --WIM compat
-	if IsAddOnLoaded("Cellular") and f ~= "Cellular" then return true end --Cellular compat
 	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
-	--one table per chatframe, incase we got whispers on 2+ chatframes
-	if not maybe[trimmedPlayer][f] then maybe[trimmedPlayer][f] = {} end
-	--one table per id, incase we got more than one whisper from a player whilst still processing
-	maybe[trimmedPlayer][f][id] = {}
-	for i = 1, select("#", ...) do
-		--store all the chat arguments incase we need to add it back (if it's a new good guy)
-		maybe[trimmedPlayer][f][id][i] = select(i, ...)
-	end
+	--store all the chat arguments incase we need to add it back (if it's a new good guy)
+	if not maybe[trimmedPlayer][id] then maybe[trimmedPlayer][id] = {select("#", ...), ...} end
+
 	--Decide the level to be filtered
 	local _, englishClass = GetPlayerInfoByGUID(guid)
 	local level = BADBOY_LEVELS.level
@@ -237,14 +238,24 @@ ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", function(...)
 		filterTable[trimmedPlayer] = level
 		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
 	end
-	return true --filter everything not good (maybe) and not GM
-end)
+	idsToFilter[id] = true
+end
 
---outgoing whisper filtering function
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", function(_,_,msg,player)
+function mod:CHAT_MSG_WHISPER_INFORM(_,_,msg,player, _, _, _, _, _, _, _, _, id)
 	local trimmedPlayer = Ambiguate(player, "none")
 	if good[trimmedPlayer] then return end --Do nothing if on safe list
-	if msg:find("^BadBoy_Levels: ") then return true end --Filter auto-response
+	if msg:find("^BadBoy_Levels: ") then
+		idsToFilter[id] = true
+		return true 
+	end --Filter auto-response
 	good[trimmedPlayer] = true --If we want to whisper someone, they're good
-end)
+end
 
+-- whisper filtering function
+local function filter(_, event, _, _, _, _, _, _, _, _, _, _, id)
+	if type(id) == "number" and idsToFilter[id] then
+		return true --filter everything not good (maybe)
+	end
+end
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
+ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)
