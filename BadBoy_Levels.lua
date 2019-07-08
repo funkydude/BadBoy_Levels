@@ -214,7 +214,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 
 	--don't filter if guild member, friend, in group, or x-server
 	if trimmedPlayer:find("-", nil, true) then return end
-	--if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
+	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
 	if not addMsg then -- On-demand hook for chat filtering
 		addMsg = ChatFrame1.AddMessage
