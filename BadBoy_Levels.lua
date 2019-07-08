@@ -206,9 +206,9 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 				C_Timer.After(60, function() whispered[trimmedPlayer] = nil end)
 			end
 			idsToFilter[id] = true
-		else
-			return
 		end
+
+		return
 	end
 	--[[ End functionality for blocking all whispers regardless of level ]]--
 
@@ -236,18 +236,20 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
 	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
 		filterTable[trimmedPlayer] = level
+		idsToFilter[id] = true
 		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
+	else
+		idsToFilter[id] = true
 	end
-	idsToFilter[id] = true
 end
 
 function mod:CHAT_MSG_WHISPER_INFORM(_,_,msg,player, _, _, _, _, _, _, _, _, id)
 	local trimmedPlayer = Ambiguate(player, "none")
 	if good[trimmedPlayer] then return end --Do nothing if on safe list
 	if msg:find("^BadBoy_Levels: ") then
-		idsToFilter[id] = true
-		return true 
-	end --Filter auto-response
+		idsToFilter[id] = true --Filter auto-response
+		return
+	end
 	good[trimmedPlayer] = true --If we want to whisper someone, they're good
 end
 
