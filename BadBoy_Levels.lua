@@ -97,8 +97,8 @@ function mod:PLAYER_LOGIN(frame, event)
 	end
 
 	good[UnitName("player")] = true --add ourself to safe list
-	if type(BADBOY_LEVELS) ~= "table" then
-		BADBOY_LEVELS = {level = 3, dklevel = 58, dhlevel = 100, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
+	if type(BADBOY_LEVELS_DB) ~= "table" then
+		BADBOY_LEVELS_DB = {level = 3, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
 	end
 
 	C_FriendList.ShowFriends() --force a friends list update on login
@@ -183,19 +183,19 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	if good[trimmedPlayer] or flag == "GM" or flag == "DEV" then return end -- don't filter if good or GM
 
 	--[[ Start functionality for blocking all whispers regardless of level ]]--
-	if BADBOY_LEVELS.blockall then
+	if BADBOY_LEVELS_DB.blockall then
 		local allow = false
 
-		if BADBOY_LEVELS.allowfriends then
+		if BADBOY_LEVELS_DB.allowfriends then
 			local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
 			if isBnetFriend or C_FriendList.IsFriend(guid) then
 				allow = true
 			end
 		end
-		if BADBOY_LEVELS.allowguild and IsGuildMember(guid) then
+		if BADBOY_LEVELS_DB.allowguild and IsGuildMember(guid) then
 			allow = true
 		end
-		if BADBOY_LEVELS.allowgroup and (UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+		if BADBOY_LEVELS_DB.allowgroup and (UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
 			allow = true
 		end
 
@@ -225,14 +225,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	--store all the chat arguments incase we need to add it back (if it's a new good guy)
 	if not maybe[trimmedPlayer][id] then maybe[trimmedPlayer][id] = {select("#", ...), ...} end
 
-	--Decide the level to be filtered
-	local _, englishClass = GetPlayerInfoByGUID(guid)
-	local level = BADBOY_LEVELS.level
-	if englishClass == "DEATHKNIGHT" then
-		level = BADBOY_LEVELS.dklevel
-	elseif englishClass == "DEMONHUNTER" then
-		level = BADBOY_LEVELS.dhlevel
-	end
+	local level = BADBOY_LEVELS_DB.level
 	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
 	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
 		filterTable[trimmedPlayer] = level

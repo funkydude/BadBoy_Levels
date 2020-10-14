@@ -1,8 +1,5 @@
 
-local L_reqlevels = "Required Levels"
-local L_others = "Others"
-local L_deathknight = "Death Knight"
-local L_demonhunter = "Demon Hunter"
+local L_reqlevel = "Required Level"
 local L_blockall = "Block All Whispers"
 local L_allowfriends = "Allow Friends"
 local L_allowguild = "Allow Guild"
@@ -10,82 +7,55 @@ local L_allowgroup = "Allow Group"
 do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "ptBR" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "deDE" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "frFR" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "ruRU" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "koKR" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "zhTW" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "zhCN" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "itIT" then
-		--L_reqlevels = "Required Levels"
-		--L_others = "Others"
-		--L_deathknight = "Death Knight"
-		--L_demonhunter = "Demon Hunter"
+		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
 		--L_allowfriends = "Allow Friends"
 		--L_allowguild = "Allow Guild"
@@ -93,113 +63,43 @@ do
 	end
 end
 
---[[ DH input box ]]--
-local levelsBoxDH = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
-levelsBoxDH:SetPoint("TOPLEFT", BadBoyLevelsConfigTitle, "BOTTOMLEFT", 5, -3)
-levelsBoxDH:SetAutoFocus(false)
-levelsBoxDH:SetNumeric(true)
-levelsBoxDH:SetWidth(30)
-levelsBoxDH:SetHeight(20)
-levelsBoxDH:SetMaxLetters(3)
-levelsBoxDH:Show()
+--[[ Level input box ]]--
+local levelInputBox = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
+levelInputBox:SetPoint("TOPLEFT", BadBoyLevelsConfigTitle, "BOTTOMLEFT", 10, -3)
+levelInputBox:SetAutoFocus(false)
+levelInputBox:SetNumeric(true)
+levelInputBox:SetWidth(20)
+levelInputBox:SetHeight(20)
+levelInputBox:SetMaxLetters(2)
+levelInputBox:Show()
 
-levelsBoxDH:SetScript("OnEnter", function(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOP")
-	GameTooltip:AddLine(L_demonhunter, 0.5, 0.5, 0)
-	GameTooltip:Show()
-end)
-levelsBoxDH:SetScript("OnLeave", GameTooltip_Hide)
-levelsBoxDH:SetScript("OnHide", function(frame)
+levelInputBox:SetScript("OnHide", function(frame)
 	local n = tonumber(frame:GetText())
 	if not n or n < 1 then
 		return
 	else
-		BADBOY_LEVELS.dhlevel = n
+		BADBOY_LEVELS_DB.level = n
 	end
 end)
-levelsBoxDH:SetScript("OnShow", function(frame)
-	frame:SetText(BADBOY_LEVELS.dhlevel)
-	if BADBOY_LEVELS.blockall then
-		frame:Disable()
-		frame:SetTextColor(0.5, 0.5, 0.5)
-	end
-end)
-
---[[ DK input box ]]--
-local levelsBoxDK = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
-levelsBoxDK:SetPoint("LEFT", levelsBoxDH, "RIGHT", 10, 0)
-levelsBoxDK:SetAutoFocus(false)
-levelsBoxDK:SetNumeric(true)
-levelsBoxDK:SetWidth(30)
-levelsBoxDK:SetHeight(20)
-levelsBoxDK:SetMaxLetters(3)
-levelsBoxDK:Show()
-
-levelsBoxDK:SetScript("OnEnter", function(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOP")
-	GameTooltip:AddLine(L_deathknight, 0.5, 0.5, 0)
-	GameTooltip:Show()
-end)
-levelsBoxDK:SetScript("OnLeave", GameTooltip_Hide)
-levelsBoxDK:SetScript("OnHide", function(frame)
-	local n = tonumber(frame:GetText())
-	if not n or n < 1 then
-		return
-	else
-		BADBOY_LEVELS.dklevel = n
-	end
-end)
-levelsBoxDK:SetScript("OnShow", function(frame)
-	frame:SetText(BADBOY_LEVELS.dklevel)
-	if BADBOY_LEVELS.blockall then
-		frame:Disable()
-		frame:SetTextColor(0.5, 0.5, 0.5)
-	end
-end)
-
---[[ Other input box ]]--
-local levelsBoxOther = CreateFrame("EditBox", nil, BadBoyConfig, "InputBoxTemplate")
-levelsBoxOther:SetPoint("LEFT", levelsBoxDK, "RIGHT", 10, 0)
-levelsBoxOther:SetAutoFocus(false)
-levelsBoxOther:SetNumeric(true)
-levelsBoxOther:SetWidth(30)
-levelsBoxOther:SetHeight(20)
-levelsBoxOther:SetMaxLetters(3)
-levelsBoxOther:Show()
-
-levelsBoxOther:SetScript("OnEnter", function(self)
-	GameTooltip:SetOwner(self, "ANCHOR_TOP")
-	GameTooltip:AddLine(L_others, 0.5, 0.5, 0)
-	GameTooltip:Show()
-end)
-levelsBoxOther:SetScript("OnLeave", GameTooltip_Hide)
-levelsBoxOther:SetScript("OnHide", function(frame)
-	local n = tonumber(frame:GetText())
-	if not n or n < 1 then
-		return
-	else
-		BADBOY_LEVELS.level = n
-	end
-end)
-levelsBoxOther:SetScript("OnShow", function(frame)
-	frame:SetText(BADBOY_LEVELS.level)
-	if BADBOY_LEVELS.blockall then
+levelInputBox:SetScript("OnShow", function(frame)
+	frame:SetText(BADBOY_LEVELS_DB.level)
+	if BADBOY_LEVELS_DB.blockall then
 		frame:Disable()
 		frame:SetTextColor(0.5, 0.5, 0.5)
 	end
 end)
 
 --[[ Input box text ]]--
-local reqLevelsTextBox = levelsBoxOther:CreateFontString(nil, nil, "GameFontHighlight")
-reqLevelsTextBox:SetPoint("LEFT", levelsBoxOther, "RIGHT", 10, 0)
-reqLevelsTextBox:SetText(L_reqlevels)
+local reqLevelsTextBox = levelInputBox:CreateFontString(nil, nil, "GameFontHighlight")
+reqLevelsTextBox:SetPoint("LEFT", levelInputBox, "RIGHT", 10, 0)
+reqLevelsTextBox:SetText(L_reqlevel)
 
 --[[ Block all whispers checkbox 1/2 ]]--
 local blockAllBtn = CreateFrame("CheckButton", nil, BadBoyConfig, "OptionsBaseCheckButtonTemplate")
-blockAllBtn:SetPoint("TOPLEFT", levelsBoxDH, "BOTTOMLEFT", -5, 0)
+blockAllBtn:SetPoint("TOPLEFT", levelInputBox, "BOTTOMLEFT", -5, 0)
 blockAllBtn:SetScript("OnShow", function(frame)
-	frame:SetChecked(BADBOY_LEVELS.blockall)
-	if BADBOY_LEVELS.blockall then
+	frame:SetChecked(BADBOY_LEVELS_DB.blockall)
+	if BADBOY_LEVELS_DB.blockall then
 		reqLevelsTextBox:SetTextColor(0.5, 0.5, 0.5)
 	end
 end)
@@ -213,7 +113,7 @@ local allowFriendsBtn = CreateFrame("CheckButton", nil, BadBoyConfig, "OptionsBa
 allowFriendsBtn:SetPoint("TOPLEFT", blockAllBtn, "BOTTOMLEFT", 30, 5)
 allowFriendsBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
-	BADBOY_LEVELS.allowfriends = tick
+	BADBOY_LEVELS_DB.allowfriends = tick
 	if tick then
 		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 	else
@@ -226,8 +126,8 @@ allowFriendsBtnText:SetPoint("LEFT", allowFriendsBtn, "RIGHT", 0, 1)
 allowFriendsBtnText:SetText(L_allowfriends)
 
 allowFriendsBtn:SetScript("OnShow", function(frame)
-	frame:SetChecked(BADBOY_LEVELS.allowfriends)
-	if not BADBOY_LEVELS.blockall then
+	frame:SetChecked(BADBOY_LEVELS_DB.allowfriends)
+	if not BADBOY_LEVELS_DB.blockall then
 		frame:Disable()
 		allowFriendsBtnText:SetTextColor(0.5, 0.5, 0.5)
 	end
@@ -238,7 +138,7 @@ local allowGuildBtn = CreateFrame("CheckButton", nil, BadBoyConfig, "OptionsBase
 allowGuildBtn:SetPoint("LEFT", allowFriendsBtn, "RIGHT", 110, 0)
 allowGuildBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
-	BADBOY_LEVELS.allowguild = tick
+	BADBOY_LEVELS_DB.allowguild = tick
 	if tick then
 		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 	else
@@ -251,8 +151,8 @@ allowGuildBtnText:SetPoint("LEFT", allowGuildBtn, "RIGHT", 0, 1)
 allowGuildBtnText:SetText(L_allowguild)
 
 allowGuildBtn:SetScript("OnShow", function(frame)
-	frame:SetChecked(BADBOY_LEVELS.allowguild)
-	if not BADBOY_LEVELS.blockall then
+	frame:SetChecked(BADBOY_LEVELS_DB.allowguild)
+	if not BADBOY_LEVELS_DB.blockall then
 		frame:Disable()
 		allowGuildBtnText:SetTextColor(0.5, 0.5, 0.5)
 	end
@@ -263,7 +163,7 @@ local allowGroupBtn = CreateFrame("CheckButton", nil, BadBoyConfig, "OptionsBase
 allowGroupBtn:SetPoint("LEFT", allowGuildBtn, "RIGHT", 110, 0)
 allowGroupBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
-	BADBOY_LEVELS.allowgroup = tick
+	BADBOY_LEVELS_DB.allowgroup = tick
 	if tick then
 		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 	else
@@ -276,8 +176,8 @@ allowGroupBtnText:SetPoint("LEFT", allowGroupBtn, "RIGHT", 0, 1)
 allowGroupBtnText:SetText(L_allowgroup)
 
 allowGroupBtn:SetScript("OnShow", function(frame)
-	frame:SetChecked(BADBOY_LEVELS.allowgroup)
-	if not BADBOY_LEVELS.blockall then
+	frame:SetChecked(BADBOY_LEVELS_DB.allowgroup)
+	if not BADBOY_LEVELS_DB.blockall then
 		frame:Disable()
 		allowGroupBtnText:SetTextColor(0.5, 0.5, 0.5)
 	end
@@ -286,14 +186,10 @@ end)
 --[[ Block all whispers checkbox 2/2 ]]--
 blockAllBtn:SetScript("OnClick", function(frame)
 	local tick = frame:GetChecked()
-	BADBOY_LEVELS.blockall = tick
+	BADBOY_LEVELS_DB.blockall = tick
 	if tick then
-		levelsBoxDH:Disable()
-		levelsBoxDH:SetTextColor(0.5, 0.5, 0.5)
-		levelsBoxDK:Disable()
-		levelsBoxDK:SetTextColor(0.5, 0.5, 0.5)
-		levelsBoxOther:Disable()
-		levelsBoxOther:SetTextColor(0.5, 0.5, 0.5)
+		levelInputBox:Disable()
+		levelInputBox:SetTextColor(0.5, 0.5, 0.5)
 		reqLevelsTextBox:SetTextColor(0.5, 0.5, 0.5)
 
 		allowFriendsBtn:Enable()
@@ -307,25 +203,21 @@ blockAllBtn:SetScript("OnClick", function(frame)
 
 		PlaySound(856) -- SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON
 	else
-		levelsBoxDH:Enable()
-		levelsBoxDH:SetTextColor(1, 1, 1)
-		levelsBoxDK:Enable()
-		levelsBoxDK:SetTextColor(1, 1, 1)
-		levelsBoxOther:Enable()
-		levelsBoxOther:SetTextColor(1, 1, 1)
+		levelInputBox:Enable()
+		levelInputBox:SetTextColor(1, 1, 1)
 		reqLevelsTextBox:SetTextColor(1, 1, 1)
 
-		BADBOY_LEVELS.allowfriends = false
+		BADBOY_LEVELS_DB.allowfriends = false
 		allowFriendsBtn:Hide() allowFriendsBtn:Show()
 		allowFriendsBtn:Disable()
 		allowFriendsBtnText:SetTextColor(0.5, 0.5, 0.5)
 
-		BADBOY_LEVELS.allowguild = false
+		BADBOY_LEVELS_DB.allowguild = false
 		allowGuildBtn:Hide() allowGuildBtn:Show()
 		allowGuildBtn:Disable()
 		allowGuildBtnText:SetTextColor(0.5, 0.5, 0.5)
 
-		BADBOY_LEVELS.allowgroup = false
+		BADBOY_LEVELS_DB.allowgroup = false
 		allowGroupBtn:Hide() allowGroupBtn:Show()
 		allowGroupBtn:Disable()
 		allowGroupBtnText:SetTextColor(0.5, 0.5, 0.5)
