@@ -187,8 +187,8 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		local allow = false
 
 		if BADBOY_LEVELS.allowfriends then
-			local _, characterName = BNGetGameAccountInfoByGUID(guid)
-			if characterName or C_FriendList.IsFriend(guid) then
+			local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
+			if isBnetFriend or C_FriendList.IsFriend(guid) then
 				allow = true
 			end
 		end
