@@ -55,15 +55,19 @@ end
 local addMsg, hookFunc
 do
 	-- For some reason any form of CHAT_MSG_SYSTEM filter causes nonsense world map taints, so use the next best thing
-	local addFrnd = ERR_FRIEND_ADDED_S:gsub("%%s", "([^ ]+)")
-	local rmvFrnd = ERR_FRIEND_REMOVED_S:gsub("%%s", "([^ ]+)")
+	local addFriend = ERR_FRIEND_ADDED_S:gsub("%%s", "([^ ]+)")
+	local removeFriend = ERR_FRIEND_REMOVED_S:gsub("%%s", "([^ ]+)")
+	local addFriendComeOnline = ERR_FRIEND_ONLINE_SS:gsub("\124Hplayer:%%s\124h%[%%s%]\124h", "\124Hplayer:([^\124]+)\124h[^\124]+\124h")
 	local info = ChatTypeInfo.SYSTEM
 	hookFunc = function(f, msg, r, g, b, ...)
 		-- This is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
 		if r == info.r and g == info.g and b == info.b then
-			local _, _, player = msg:find(addFrnd)
+			local _, _, player = msg:find(addFriend)
 			if not player then
-				_, _, player = msg:find(rmvFrnd)
+				_, _, player = msg:find(removeFriend)
+			end
+			if not player then
+				_, _, player = msg:find(addFriendComeOnline)
 			end
 			if player and filterTable[player] then
 				return
@@ -125,7 +129,7 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 	end
 	-- end first run (player login)
 
-	function mod:FRIENDLIST_UPDATE(_, _, msg)
+	function mod:FRIENDLIST_UPDATE()
 		local num = C_FriendList.GetNumFriends() --get total friends
 		for i = num, 1, -1 do
 			local tbl = C_FriendList.GetFriendInfoByIndex(i)
@@ -135,6 +139,8 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 				C_FriendList.ShowFriends()
 			else
 				if maybe[player] then --do we need to process this person?
+					if level == 0 then return end -- FRIENDLIST_UPDATE fires 2 times per addition (WoW v9.0.1) we need to wait for the 2nd firing to get good data
+
 					C_FriendList.RemoveFriendByIndex(i)
 					if type(level) ~= "number" then
 						print("|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was:", level)
@@ -171,6 +177,11 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 						end
 					end
 					maybe[player] = nil --remove player entry
+					if not next(maybe) then
+						-- No more players left so unmute the new "player has come online" sound that plays when a new friend is added.
+						-- Hopefully no one is actually muting this, because this will break it
+						C_Timer.After(0, function() UnmuteSoundFile(567518) end)
+					end
 				end
 			end
 		end
@@ -230,6 +241,9 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
 		filterTable[trimmedPlayer] = level
 		idsToFilter[id] = true
+		-- Mute the new "player has come online" sound that plays when a friend is added.
+		-- Hopefully no one is actually muting this, because this will break it when it's unmuted above
+		MuteSoundFile(567518)
 		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
 	else
 		idsToFilter[id] = true
