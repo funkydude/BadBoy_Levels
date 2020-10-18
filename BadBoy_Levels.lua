@@ -52,31 +52,6 @@ do
 	end
 end
 
-local addMsg, hookFunc
-do
-	-- For some reason any form of CHAT_MSG_SYSTEM filter causes nonsense world map taints, so use the next best thing
-	local addFriend = ERR_FRIEND_ADDED_S:gsub("%%s", "([^ ]+)")
-	local removeFriend = ERR_FRIEND_REMOVED_S:gsub("%%s", "([^ ]+)")
-	local addFriendComeOnline = ERR_FRIEND_ONLINE_SS:gsub("\124Hplayer:%%s\124h%[%%s%]\124h", "\124Hplayer:([^\124]+)\124h[^\124]+\124h")
-	local info = ChatTypeInfo.SYSTEM
-	hookFunc = function(f, msg, r, g, b, ...)
-		-- This is a filter to remove the player added/removed from friends messages when we use it, otherwise they are left alone
-		if r == info.r and g == info.g and b == info.b then
-			local _, _, player = msg:find(addFriend)
-			if not player then
-				_, _, player = msg:find(removeFriend)
-			end
-			if not player then
-				_, _, player = msg:find(addFriendComeOnline)
-			end
-			if player and filterTable[player] then
-				return
-			end
-		end
-		return addMsg(f, msg, r, g, b, ...)
-	end
-end
-
 function mod:PLAYER_LOGIN(frame, event)
 	frame:UnregisterEvent(event)
 	frame:RegisterEvent("FRIENDLIST_UPDATE")
@@ -180,7 +155,10 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 					if not next(maybe) then
 						-- No more players left so unmute the new "player has come online" sound that plays when a new friend is added.
 						-- Hopefully no one is actually muting this, because this will break it
-						C_Timer.After(0, function() UnmuteSoundFile(567518) end)
+						C_Timer.After(0, function()
+							UnmuteSoundFile(567518)
+							ChatFrame1:RegisterEvent("CHAT_MSG_SYSTEM") -- Re-enable the system message prints "player has come online"
+						end)
 					end
 				end
 			end
@@ -227,11 +205,6 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	if trimmedPlayer:find("-", nil, true) then return end
 	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
-	if not addMsg then -- On-demand hook for chat filtering
-		addMsg = ChatFrame1.AddMessage
-		ChatFrame1.AddMessage = hookFunc
-	end
-
 	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
 	--store all the chat arguments incase we need to add it back (if it's a new good guy)
 	if not maybe[trimmedPlayer][id] then maybe[trimmedPlayer][id] = {select("#", ...), ...} end
@@ -244,6 +217,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		-- Mute the new "player has come online" sound that plays when a friend is added.
 		-- Hopefully no one is actually muting this, because this will break it when it's unmuted above
 		MuteSoundFile(567518)
+		ChatFrame1:UnregisterEvent("CHAT_MSG_SYSTEM") -- Block system messages "player has come online" and "player added to friends"
 		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
 	else
 		idsToFilter[id] = true
