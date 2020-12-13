@@ -6,6 +6,7 @@ local good, maybe, filterTable, whispered = {}, {}, {}, {}
 local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
+local connectedRealms = {}
 
 badboy:SetScript("OnEvent", function(frame, event, ...)
 	mod[event](mod, frame, event, ...)
@@ -56,6 +57,12 @@ function mod:PLAYER_LOGIN(frame, event)
 	frame:UnregisterEvent(event)
 	frame:RegisterEvent("FRIENDLIST_UPDATE")
 	frame:RegisterEvent("CHAT_MSG_SYSTEM")
+
+	local realms = GetAutoCompleteRealms()
+	for i = 1, #realms do
+		local entry = realms[i]
+		connectedRealms[entry] = true
+	end
 
 	local tbl = {
 		"CHAT_MSG_WHISPER",
@@ -201,8 +208,14 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 	end
 	--[[ End functionality for blocking all whispers regardless of level ]]--
 
-	--don't filter if guild member, friend, in group, or x-server
-	if trimmedPlayer:find("-", nil, true) then return end
+	--we can only filter whispers from realms connected to ours
+	if trimmedPlayer:find("-", nil, true) then
+		local whisperRealm = trimmedPlayer:gsub("^[^%-]+%-(.+)", "%1")
+		if not connectedRealms[whisperRealm] then
+			return
+		end
+	end
+	--don't filter if guild member, character friend, bnet friend, or in our group
 	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
 
 	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
