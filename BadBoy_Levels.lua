@@ -64,21 +64,21 @@ function mod:PLAYER_LOGIN(frame, event)
 		connectedRealms[entry] = true
 	end
 
-	local tbl = {
+	local eventList = {
 		"CHAT_MSG_WHISPER",
 		"CHAT_MSG_WHISPER_INFORM",
 	}
-	for i = 1, #tbl do
-		local event = tbl[i]
-		local frames = {GetFramesRegisteredForEvent(event)}
-		for i = 1, #frames do
-			local f = frames[i]
-			f:UnregisterEvent(event)
+	for i = 1, #eventList do
+		local wEvent = eventList[i]
+		local frames = {GetFramesRegisteredForEvent(wEvent)}
+		for j = 1, #frames do
+			local f = frames[j]
+			f:UnregisterEvent(wEvent)
 		end
-		frame:RegisterEvent(event)
-		for i = 1, #frames do
-			local f = frames[i]
-			f:RegisterEvent(event)
+		frame:RegisterEvent(wEvent)
+		for j = 1, #frames do
+			local f = frames[j]
+			f:RegisterEvent(wEvent)
 		end
 	end
 
@@ -97,7 +97,7 @@ function mod:CHAT_MSG_SYSTEM(_, _, msg)
 	end
 end
 
-function mod:FRIENDLIST_UPDATE(_, _, msg)
+function mod:FRIENDLIST_UPDATE()
 	-- first run only (player login)
 	local num = C_FriendList.GetNumFriends()
 	for i = num, 1, -1 do
@@ -111,9 +111,9 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 	end
 	-- end first run (player login)
 
-	function mod:FRIENDLIST_UPDATE()
-		local num = C_FriendList.GetNumFriends() --get total friends
-		for i = num, 1, -1 do
+	self.FRIENDLIST_UPDATE = function()
+		local numFriends = C_FriendList.GetNumFriends() --get total friends
+		for i = numFriends, 1, -1 do
 			local tbl = C_FriendList.GetFriendInfoByIndex(i)
 			local player, level = tbl.name, tbl.level
 			--sometimes a friend will return nil, I have no idea why, so force another update
@@ -148,8 +148,8 @@ function mod:FRIENDLIST_UPDATE(_, _, msg)
 								Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
 							else
 								local frames = {GetFramesRegisteredForEvent("CHAT_MSG_WHISPER")}
-								for i = 1, #frames do
-									local f = frames[i]
+								for j = 1, #frames do
+									local f = frames[j]
 									local name = f.GetName and f:GetName()
 									if type(name) == "string" and name:find("^ChatFrame") then
 										ChatFrame_MessageEventHandler(f, "CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
@@ -248,7 +248,7 @@ function mod:CHAT_MSG_WHISPER_INFORM(_,_,msg,player, _, _, _, _, _, _, _, _, id)
 end
 
 -- whisper filtering function
-local function filter(_, event, _, _, _, _, _, _, _, _, _, _, id)
+local function filter(_, _, _, _, _, _, _, _, _, _, _, _, id)
 	if type(id) == "number" and idsToFilter[id] then
 		return true --filter everything not good (maybe)
 	end
