@@ -18,6 +18,7 @@ globals = {
 	"ChatFrame1",
 	"ERR_FRIEND_LIST_FULL",
 	"GetAutoCompleteRealms",
+	"geterrorhandler",
 	"GetFramesRegisteredForEvent",
 	"IsAddOnLoaded",
 	"IsGuildMember",
@@ -35,4 +36,7 @@ globals = {
 	"CreateFrame",
 	"GetLocale",
 	"PlaySound",
+
+	-- Classic
+	"BNGetGameAccountInfoByGUID",
 }
