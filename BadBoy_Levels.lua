@@ -165,9 +165,7 @@ function mod:FRIENDLIST_UPDATE()
 						-- No more players left so unmute the new "player has come online" sound that plays when a new friend is added.
 						-- Hopefully no one is actually muting this, because this will break it
 						C_Timer.After(0, function()
-							if UnmuteSoundFile then -- XXX classic compat
-								UnmuteSoundFile(567518)
-							end
+							UnmuteSoundFile(567518)
 							ChatFrame1:RegisterEvent("CHAT_MSG_SYSTEM") -- Re-enable the system message prints "player has come online"
 						end)
 					end
@@ -240,9 +238,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		idsToFilter[id] = true
 		-- Mute the new "player has come online" sound that plays when a friend is added.
 		-- Hopefully no one is actually muting this, because this will break it when it's unmuted above
-		if MuteSoundFile then -- XXX classic compat
-			MuteSoundFile(567518)
-		end
+		MuteSoundFile(567518)
 		ChatFrame1:UnregisterEvent("CHAT_MSG_SYSTEM") -- Block system messages "player has come online" and "player added to friends"
 		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
 	else
