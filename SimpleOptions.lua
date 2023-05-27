@@ -31,11 +31,11 @@ do
 		--L_allowguild = "Allow Guild"
 		--L_allowgroup = "Allow Group"
 	elseif L == "ruRU" then
-		--L_reqlevel = "Required Level"
-		--L_blockall = "Block All Whispers"
-		--L_allowfriends = "Allow Friends"
-		--L_allowguild = "Allow Guild"
-		--L_allowgroup = "Allow Group"
+		L_reqlevel = "Требуемый уровень"
+		L_blockall = "Блокировать все шепоты"
+		L_allowfriends = "Разрешить друзей"
+		L_allowguild = "Разрешить гильдию"
+		L_allowgroup = "Разрешить группу"
 	elseif L == "koKR" then
 		--L_reqlevel = "Required Level"
 		--L_blockall = "Block All Whispers"
