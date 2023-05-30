@@ -5,7 +5,7 @@
 ## Notes-frFR: Filtre les chuchotements par niveau, au minimum.
 ## Notes-deDE: Filtert Flüsternachrichten nach Level, minimalistisch.
 ## Notes-ptBR: Filtra sussurros por nível, no mínimo.
-## Notes-ruRU: Фильтрация сообщений по уровню, минимальная.
+## Notes-ruRU: Фильтрация шепота от игроков по соответствующему уровню.
 ## Notes-zhTW: 按照最低等級過濾悄悄話。
 ## Notes-zhCN: 按照最低等级过滤密语。
 ## Notes-koKR: 귓속말을 필터하기 위한 최소 레벨
