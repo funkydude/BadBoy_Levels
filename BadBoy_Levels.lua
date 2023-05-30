@@ -32,7 +32,7 @@ do
 		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
 	elseif L == "ruRU" then
 		whisp = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, чтобы шептать мне."
-		--whisp_notallowed = "BadBoy_Levels: Вы не соответствуете требованиям, чтобы шептать мне."
+		whisp_notallowed = "BadBoy_Levels: Вы не соответствуете требованиям, чтобы шептать мне."
 		err = "Вы достигли максимального количества друзей. Удалите хотя бы двоих, чтобы этот аддон работал правильно!"
 	elseif L == "koKR" then
 		whisp = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
