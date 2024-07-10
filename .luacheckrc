@@ -5,6 +5,7 @@ ignore = {
 	"212/self", -- (W212) unused argument self
 	"542", -- (W542) empty if branch
 	"121/BADBOY_LEVELS_DB", -- (W121) Our global SV table
+	"122/BADBOY_LEVELS_DB", -- (W122) Our global SV table
 }
 read_globals = {
 	"Ambiguate",
