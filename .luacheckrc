@@ -4,11 +4,13 @@ codes = true
 ignore = {
 	"212/self", -- (W212) unused argument self
 	"542", -- (W542) empty if branch
+	"121/BADBOY_LEVELS_DB", -- (W121) Our global SV table
 }
-globals = {
+read_globals = {
 	"Ambiguate",
 	"BadBoyIsFriendly",
 	"BADBOY_LEVELS_DB",
+	"C_AddOns",
 	"C_BattleNet",
 	"C_FriendList",
 	"C_Timer",

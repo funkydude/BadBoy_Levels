@@ -7,6 +7,7 @@ local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 local connectedRealms = {}
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 
 badboy:SetScript("OnEvent", function(frame, event, ...)
 	mod[event](mod, frame, event, ...)
