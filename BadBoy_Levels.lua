@@ -44,8 +44,8 @@ do
 		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 		err = "你的好友列表滿了，此插件需要你騰出2個好友空位!"
 	elseif L == "zhCN" then
-		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能和我讲话。"
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能密我。"
+		whisp_notallowed = "BadBoy_Levels: 你的角色等级未达到密语要求。"
 		err = "你的好友列表已满，此模块需要你腾出2个好友空位！"
 	elseif L == "itIT" then
 		whisp = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
