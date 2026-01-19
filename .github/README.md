@@ -12,4 +12,5 @@
 Simply, if a "bad" person whispers you, the whisper is blocked (hidden), then you automatically send them a whisper (also hidden) of what level they must be for you to see their whispers.
 
 ## Download
-https://www.curseforge.com/wow/addons/badboy_levels
+* <https://www.curseforge.com/wow/addons/badboy_levels>
+* <https://addons.wago.io/addons/badboy-levels>
