@@ -25,6 +25,7 @@ read_globals = {
 	"GetFramesRegisteredForEvent",
 	"IsAddOnLoaded",
 	"IsGuildMember",
+	"issecretvalue",
 	"MuteSoundFile",
 	"SendChatMessage",
 	"UnitInParty",
