@@ -92,7 +92,9 @@ function mod:PLAYER_LOGIN(frame, event)
 end
 badboy:RegisterEvent("PLAYER_LOGIN")
 
+local issecretvalue = issecretvalue or function() return false end
 function mod:CHAT_MSG_SYSTEM(_, _, msg)
+	if issecretvalue(msg) then return end
 	if msg == ERR_FRIEND_LIST_FULL then
 		print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
 	end
@@ -176,7 +178,6 @@ function mod:FRIENDLIST_UPDATE()
 	end
 end
 
-local issecretvalue = issecretvalue or function() return false end
 function mod:CHAT_MSG_WHISPER(_, _, ...)
 	local _, player, _, _, _, flag, _, _, _, _, id, guid = ...
 	if issecretvalue(player) then return end
