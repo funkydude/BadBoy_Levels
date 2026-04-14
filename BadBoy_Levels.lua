@@ -137,7 +137,7 @@ function mod:FRIENDLIST_UPDATE()
 						--Whisper the bad player what level they must be to whisper us
 						if not whispered[player] then
 							whispered[player] = true
-							SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
+							C_ChatInfo.SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
 							C_Timer.After(60, function() whispered[player] = nil end)
 						end
 					else
@@ -157,7 +157,11 @@ function mod:FRIENDLIST_UPDATE()
 									local f = frames[j]
 									local name = f.GetName and f:GetName()
 									if type(name) == "string" and name:find("^ChatFrame") then
-										ChatFrame_MessageEventHandler(f, "CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
+										if ChatFrame_MessageEventHandler then
+											ChatFrame_MessageEventHandler(f, "CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
+										else
+											f:MessageEventHandler("CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
+										end
 									end
 								end
 							end
@@ -211,7 +215,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		if not allow then
 			if not whispered[trimmedPlayer] then
 				whispered[trimmedPlayer] = true
-				SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
+				C_ChatInfo.SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
 				C_Timer.After(60, function() whispered[trimmedPlayer] = nil end)
 			end
 			idsToFilter[id] = true
@@ -268,5 +272,6 @@ local function filter(_, _, _, _, _, _, _, _, _, _, _, _, id)
 		return true --filter everything not good (maybe)
 	end
 end
+local ChatFrame_AddMessageEventFilter = ChatFrameUtil and ChatFrameUtil.AddMessageEventFilter or ChatFrame_AddMessageEventFilter
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
 ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)
