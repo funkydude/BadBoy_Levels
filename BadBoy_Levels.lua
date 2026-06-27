@@ -74,12 +74,16 @@ function mod:PLAYER_LOGIN(frame, event)
 		local frames = {GetFramesRegisteredForEvent(wEvent)}
 		for j = 1, #frames do
 			local f = frames[j]
-			f:UnregisterEvent(wEvent)
+			if not frame.IsForbidden(f) then
+				frame.UnregisterEvent(f, wEvent)
+			end
 		end
 		frame:RegisterEvent(wEvent)
 		for j = 1, #frames do
 			local f = frames[j]
-			f:RegisterEvent(wEvent)
+			if not frame.IsForbidden(f) then
+				frame.RegisterEvent(f, wEvent)
+			end
 		end
 	end
 
