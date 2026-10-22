@@ -7,7 +7,7 @@ local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
 local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
 local connectedRealms = {}
-local IsAddOnLoaded = C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
 
 badboy:SetScript("OnEvent", function(frame, event, ...)
 	mod[event](mod, frame, event, ...)
@@ -87,7 +87,13 @@ function mod:PLAYER_LOGIN(frame, event)
 		end
 	end
 
-	good[UnitName("player")] = true --add ourself to safe list
+	if RegionalUniqueNamesEnabled and RegionalUniqueNamesEnabled() then
+		local firstname, surname = UnitNameUnmodified("player")
+		local myName = firstname .. " " .. surname
+		good[myName] = true --add ourself to safe list
+	else
+		good[UnitNameUnmodified("player")] = true --add ourself to safe list
+	end
 	if type(BADBOY_LEVELS_DB) ~= "table" then
 		BADBOY_LEVELS_DB = {level = 3, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
 	end
@@ -96,7 +102,7 @@ function mod:PLAYER_LOGIN(frame, event)
 end
 badboy:RegisterEvent("PLAYER_LOGIN")
 
-local issecretvalue = issecretvalue or function() return false end
+local issecretvalue = issecretvalue
 function mod:CHAT_MSG_SYSTEM(_, _, msg)
 	if issecretvalue(msg) then return end
 	if msg == ERR_FRIEND_LIST_FULL then
@@ -161,11 +167,7 @@ function mod:FRIENDLIST_UPDATE()
 									local f = frames[j]
 									local name = f.GetName and f:GetName()
 									if type(name) == "string" and name:find("^ChatFrame") then
-										if ChatFrame_MessageEventHandler then
-											ChatFrame_MessageEventHandler(f, "CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
-										else
-											f:MessageEventHandler("CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
-										end
+										f:MessageEventHandler("CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
 									end
 								end
 							end
@@ -197,16 +199,9 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		local allow = false
 
 		if BADBOY_LEVELS_DB.allowfriends then
-			if C_BattleNet then -- Retail
-				local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
-				if isBnetFriend or C_FriendList.IsFriend(guid) then
-					allow = true
-				end
-			else -- XXX classic compat
-				local _, isBnetFriend = BNGetGameAccountInfoByGUID(guid)
-				if isBnetFriend or C_FriendList.IsFriend(guid) then
-					allow = true
-				end
+			local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
+			if isBnetFriend or C_FriendList.IsFriend(guid) then
+				allow = true
 			end
 		end
 		if BADBOY_LEVELS_DB.allowguild and IsGuildMember(guid) then
@@ -237,7 +232,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		end
 	end
 	--don't filter if guild member, character friend, bnet friend, or in our group
-	if BadBoyIsFriendly(trimmedPlayer, flag, id, guid) then return end
+	if BadBoyIsFriendly(guid, flag) then return end
 
 	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
 	--store all the chat arguments incase we need to add it back (if it's a new good guy)
@@ -276,6 +271,5 @@ local function filter(_, _, _, _, _, _, _, _, _, _, _, _, id)
 		return true --filter everything not good (maybe)
 	end
 end
-local ChatFrame_AddMessageEventFilter = ChatFrameUtil and ChatFrameUtil.AddMessageEventFilter or ChatFrame_AddMessageEventFilter
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
-ChatFrame_AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)
+ChatFrameUtil.AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
+ChatFrameUtil.AddMessageEventFilter("CHAT_MSG_WHISPER_INFORM", filter)

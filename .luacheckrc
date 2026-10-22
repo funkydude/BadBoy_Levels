@@ -18,20 +18,18 @@ read_globals = {
 	"C_Timer",
 	"Cellular",
 	"ChatFrameUtil",
-	"ChatFrame_AddMessageEventFilter",
-	"ChatFrame_MessageEventHandler",
 	"ChatFrame1",
 	"ERR_FRIEND_LIST_FULL",
 	"GetAutoCompleteRealms",
 	"geterrorhandler",
 	"GetFramesRegisteredForEvent",
-	"IsAddOnLoaded",
 	"IsGuildMember",
 	"issecretvalue",
 	"MuteSoundFile",
+	"RegionalUniqueNamesEnabled",
 	"UnitInParty",
 	"UnitInRaid",
-	"UnitName",
+	"UnitNameUnmodified",
 	"UnmuteSoundFile",
 	"WIM",
 
@@ -41,7 +39,4 @@ read_globals = {
 	"CreateFrame",
 	"GetLocale",
 	"PlaySound",
-
-	-- Classic
-	"BNGetGameAccountInfoByGUID",
 }
