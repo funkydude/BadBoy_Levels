@@ -207,7 +207,7 @@ function mod:CHAT_MSG_WHISPER(_, _, ...)
 		if BADBOY_LEVELS_DB.allowguild and IsGuildMember(guid) then
 			allow = true
 		end
-		if BADBOY_LEVELS_DB.allowgroup and (UnitInRaid(trimmedPlayer) or UnitInParty(trimmedPlayer)) then
+		if BADBOY_LEVELS_DB.allowgroup and C_PartyInfo.IsGUIDInGroup(guid) then
 			allow = true
 		end
 
