@@ -8,31 +8,31 @@ do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
 		L_whisper_toolow = "BadBoy_Levels: Necesitas ser nivel %d para susurrarme."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: No cumples los requisitos para susurrarme."
 	elseif L == "ptBR" then
 		L_whisper_toolow = "BadBoy_Levels: Você precisa ter nível %d para me sussurrar."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: Você não atende aos requisitos para me sussurrar."
 	elseif L == "deDE" then
 		L_whisper_toolow = "BadBoy_Levels: Du musst Level %d sein, um mir etwas flüstern zu können."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: Du erfüllst nicht die Voraussetzungen, um mir etwas flüstern zu können."
 	elseif L == "frFR" then
 		L_whisper_toolow = "BadBoy_Levels: Vous devez être au moins de niveau %d pour me chuchoter."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: Vous ne remplissez pas les conditions requises pour me chuchoter."
 	elseif L == "ruRU" then
 		L_whisper_toolow = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, чтобы шептать мне."
 		L_whisper_notallowed = "BadBoy_Levels: Вы не соответствуете требованиям, чтобы шептать мне."
 	elseif L == "koKR" then
 		L_whisper_toolow = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: 저에게 귓속말을 보내기 위한 요구 조건을 충족하지 못했습니다."
 	elseif L == "zhTW" then
 		L_whisper_toolow = "BadBoy_Levels: 你起碼要達到 %d 級才能密我。"
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: 你未達到密我的要求。"
 	elseif L == "zhCN" then
 		L_whisper_toolow = "BadBoy_Levels: 你起码要达到 %d 级才能密我。"
 		L_whisper_notallowed = "BadBoy_Levels: 你的角色等级未达到密语要求。"
 	elseif L == "itIT" then
 		L_whisper_toolow = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
-		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
+		L_whisper_notallowed = "BadBoy_Levels: Non soddisfi i requisiti per sussurrarmi."
 	end
 end
 
@@ -48,6 +48,7 @@ else
 end
 
 local issecretvalue = issecretvalue
+local GetPlayerInfoByGUID = GetPlayerInfoByGUID
 local badboy = CreateFrame("Frame")
 badboy:SetScript("OnEvent", function(_, event, msg, player, _, _, _, flag, _, _, _, _, id, guid)
 	if event == "CHAT_MSG_WHISPER" then
