@@ -14,6 +14,7 @@
 ## Notes-itIT: Filtra i sussurri per livello.
 ## Author: Funkeh
 ## SavedVariables: BADBOY_LEVELS_DB
+## LoadSavedVariablesFirst: 1
 ## Dependencies: BadBoy
 ## OptionalDeps: BadBoy_Guilded
 ## X-Credits: Mikk

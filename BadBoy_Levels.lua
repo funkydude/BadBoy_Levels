@@ -1,274 +1,124 @@
 
---good players(guildies/friends), maybe(for processing)
-local badboy = CreateFrame("Frame")
-local mod, idsToFilter = {}, {}
-local good, maybe, filterTable, whispered = {}, {}, {}, {}
-local whisp = "BadBoy_Levels: You need to be level %d to whisper me."
-local whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-local err = "You have reached the maximum amount of friends, remove 2 for this addon to function properly!"
-local connectedRealms = {}
-local IsAddOnLoaded = C_AddOns.IsAddOnLoaded
-
-badboy:SetScript("OnEvent", function(frame, event, ...)
-	mod[event](mod, frame, event, ...)
-end)
+local chatMessageIDsToFilter = {}
+local goodPlayersNeverFiltered, playersAlreadyWarned = {}, {}
+local L_whisper_toolow = "BadBoy_Levels: You need to be level %d to whisper me."
+local L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 
 do
 	local L = GetLocale()
 	if L == "esES" or L == "esMX" then
-		whisp = "BadBoy_Levels: Necesitas ser nivel %d para susurrarme."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "Has llegado a la cantidad máxima de amigos, quita 2 amigos para que este addon funcione propiamente."
+		L_whisper_toolow = "BadBoy_Levels: Necesitas ser nivel %d para susurrarme."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "ptBR" then
-		whisp = "BadBoy_Levels: Você precisa ter nível %d para me sussurrar."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "Você atingiu o numero máximo de amigos, remova 2 para este addon funcionar corretamente!"
+		L_whisper_toolow = "BadBoy_Levels: Você precisa ter nível %d para me sussurrar."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "deDE" then
-		whisp = "BadBoy_Levels: Du musst Level %d sein, um mir etwas flüstern zu können."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "Du hast die maximale Anzahl an Freunden erreicht, bitte entferne 2, damit dieses Addon richtig funktioniert!"
+		L_whisper_toolow = "BadBoy_Levels: Du musst Level %d sein, um mir etwas flüstern zu können."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "frFR" then
-		whisp = "BadBoy_Levels: Vous devez être au moins de niveau %d pour me chuchoter."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "Vous avez atteint la limite de contenu de votre liste d'amis. Enlevez-en 2 pour que cet addon fonctionne correctement !"
+		L_whisper_toolow = "BadBoy_Levels: Vous devez être au moins de niveau %d pour me chuchoter."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "ruRU" then
-		whisp = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, чтобы шептать мне."
-		whisp_notallowed = "BadBoy_Levels: Вы не соответствуете требованиям, чтобы шептать мне."
-		err = "Вы достигли максимального количества друзей. Удалите хотя бы двоих, чтобы этот аддон работал правильно!"
+		L_whisper_toolow = "BadBoy_Levels: Вы должны быть уровнем не ниже %d, чтобы шептать мне."
+		L_whisper_notallowed = "BadBoy_Levels: Вы не соответствуете требованиям, чтобы шептать мне."
 	elseif L == "koKR" then
-		whisp = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "친구 목록이 최대한도에 도달했습니다. 제대로 애드온이 작업을 하기 위해서는 2명을 제거해야 합니다!"
+		L_whisper_toolow = "BadBoy_Levels: 저에게 귓속말을 보내기 위해서는 레벨 %d이 필요합니다."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "zhTW" then
-		whisp = "BadBoy_Levels: 你起碼要達到 %d 級才能密我。"
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "你的好友列表滿了，此插件需要你騰出2個好友空位!"
+		L_whisper_toolow = "BadBoy_Levels: 你起碼要達到 %d 級才能密我。"
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	elseif L == "zhCN" then
-		whisp = "BadBoy_Levels: 你起码要达到 %d 级才能密我。"
-		whisp_notallowed = "BadBoy_Levels: 你的角色等级未达到密语要求。"
-		err = "你的好友列表已满，此模块需要你腾出2个好友空位！"
+		L_whisper_toolow = "BadBoy_Levels: 你起码要达到 %d 级才能密我。"
+		L_whisper_notallowed = "BadBoy_Levels: 你的角色等级未达到密语要求。"
 	elseif L == "itIT" then
-		whisp = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
-		--whisp_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
-		err = "Hai raggiunto il limite massimo di amici, rimuovine 2 per permettere a questo addon di funzionare correttamente!"
+		L_whisper_toolow = "BadBoy_Levels: E' necessario che tu sia di livello %d per sussurrarmi."
+		--L_whisper_notallowed = "BadBoy_Levels: You do not meet the requirements to whisper me."
 	end
 end
 
-function mod:PLAYER_LOGIN(frame, event)
-	frame:UnregisterEvent(event)
-	frame:RegisterEvent("FRIENDLIST_UPDATE")
-	frame:RegisterEvent("CHAT_MSG_SYSTEM")
-
-	local realms = GetAutoCompleteRealms()
-	for i = 1, #realms do
-		local entry = realms[i]
-		connectedRealms[entry] = true
-	end
-
-	local eventList = {
-		"CHAT_MSG_WHISPER",
-		"CHAT_MSG_WHISPER_INFORM",
-	}
-	for i = 1, #eventList do
-		local wEvent = eventList[i]
-		local frames = {GetFramesRegisteredForEvent(wEvent)}
-		for j = 1, #frames do
-			local f = frames[j]
-			if not frame.IsForbidden(f) then
-				frame.UnregisterEvent(f, wEvent)
-			end
-		end
-		frame:RegisterEvent(wEvent)
-		for j = 1, #frames do
-			local f = frames[j]
-			if not frame.IsForbidden(f) then
-				frame.RegisterEvent(f, wEvent)
-			end
-		end
-	end
-
-	if RegionalUniqueNamesEnabled and RegionalUniqueNamesEnabled() then
-		local firstname, surname = UnitNameUnmodified("player")
-		local myName = firstname .. " " .. surname
-		good[myName] = true --add ourself to safe list
-	else
-		good[UnitNameUnmodified("player")] = true --add ourself to safe list
-	end
-	if type(BADBOY_LEVELS_DB) ~= "table" then
-		BADBOY_LEVELS_DB = {level = 3, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
-	end
-
-	C_FriendList.ShowFriends() --force a friends list update on login
+goodPlayersNeverFiltered[UnitGUID("player")] = true --add ourself to safe list
+if type(BADBOY_LEVELS_DB) ~= "table" then
+	BADBOY_LEVELS_DB = {level = 3, blockall = false, allowfriends = false, allowguild = false, allowgroup = false}
+else
+	if type(BADBOY_LEVELS_DB.blockall) ~= "boolean" then BADBOY_LEVELS_DB.blockall = false end
+	if type(BADBOY_LEVELS_DB.allowfriends) ~= "boolean" then BADBOY_LEVELS_DB.allowfriends = false end
+	if type(BADBOY_LEVELS_DB.allowguild) ~= "boolean" then BADBOY_LEVELS_DB.allowguild = false end
+	if type(BADBOY_LEVELS_DB.allowgroup) ~= "boolean" then BADBOY_LEVELS_DB.allowgroup = false end
+	if type(BADBOY_LEVELS_DB.level) ~= "number" then BADBOY_LEVELS_DB.level = 3 end
 end
-badboy:RegisterEvent("PLAYER_LOGIN")
 
 local issecretvalue = issecretvalue
-function mod:CHAT_MSG_SYSTEM(_, _, msg)
-	if issecretvalue(msg) then return end
-	if msg == ERR_FRIEND_LIST_FULL then
-		print("|cFF33FF99BadBoy_Levels|r: ", err) --print a warning if we see a friends full message
-	end
-end
+local badboy = CreateFrame("Frame")
+badboy:SetScript("OnEvent", function(_, event, msg, player, _, _, _, flag, _, _, _, _, id, guid)
+	if event == "CHAT_MSG_WHISPER" then
+		if issecretvalue(guid) then return end
+		if goodPlayersNeverFiltered[guid] or flag == "GM" or flag == "DEV" then return end -- don't filter if good or GM
 
-function mod:FRIENDLIST_UPDATE()
-	-- first run only (player login)
-	local num = C_FriendList.GetNumFriends()
-	for i = num, 1, -1 do
-		local tbl = C_FriendList.GetFriendInfoByIndex(i)
-		--add friends to safe list
-		if tbl.notes == "badboy_temp" then
-			C_FriendList.RemoveFriendByIndex(i)
-		elseif type(tbl.name) == "string" then
-			good[tbl.name] = true
-		end
-	end
-	-- end first run (player login)
+		--[[ Start functionality for blocking all whispers regardless of level ]]--
+		if BADBOY_LEVELS_DB.blockall then
+			local allow = false
 
-	self.FRIENDLIST_UPDATE = function()
-		local numFriends = C_FriendList.GetNumFriends() --get total friends
-		for i = numFriends, 1, -1 do
-			local tbl = C_FriendList.GetFriendInfoByIndex(i)
-			local player, level = tbl.name, tbl.level
-			--sometimes a friend will return nil, I have no idea why, so force another update
-			if not player then
-				C_FriendList.ShowFriends()
-			else
-				if maybe[player] then --do we need to process this person?
-					if level == 0 then return end -- FRIENDLIST_UPDATE fires 2 times per addition (WoW v9.0.1) we need to wait for the 2nd firing to get good data
-
-					C_FriendList.RemoveFriendByIndex(i)
-					if type(level) ~= "number" then
-						local msg = "|cFF33FF99BadBoy_Levels|r: Level wasn't a number, tell BadBoy author! It was: ".. tostring(level)
-						print(msg)
-						geterrorhandler()(msg)
-						level = 1000
-					end
-					if level < filterTable[player] then
-						--Whisper the bad player what level they must be to whisper us
-						if not whispered[player] then
-							whispered[player] = true
-							C_ChatInfo.SendChatMessage(whisp:format(filterTable[player]), "WHISPER", nil, player)
-							C_Timer.After(60, function() whispered[player] = nil end)
-						end
-					else
-						good[player] = true --higher = good
-						for id, argsTable in next, maybe[player] do
-							--this player is good, we must restore the whisper(s) back to chat
-							idsToFilter[id] = nil
-							local argsCount = argsTable[1]
-							if IsAddOnLoaded("WIM") then --WIM compat
-								WIM.modules.WhisperEngine:CHAT_MSG_WHISPER(unpack(argsTable, 2, argsCount+1))
-							elseif IsAddOnLoaded("Cellular") then --Cellular compat
-								local a1,a2,_,_,_,a6,_,_,_,_,a11,a12 = unpack(argsTable, 2, argsCount+1)
-								Cellular:IncomingMessage(a2, a1, a6, nil, a11, a12)
-							else
-								local frames = {GetFramesRegisteredForEvent("CHAT_MSG_WHISPER")}
-								for j = 1, #frames do
-									local f = frames[j]
-									local name = f.GetName and f:GetName()
-									if type(name) == "string" and name:find("^ChatFrame") then
-										f:MessageEventHandler("CHAT_MSG_WHISPER", unpack(argsTable, 2, argsCount+1))
-									end
-								end
-							end
-						end
-					end
-					maybe[player] = nil --remove player entry
-					if not next(maybe) then
-						-- No more players left so unmute the new "player has come online" sound that plays when a new friend is added.
-						-- Hopefully no one is actually muting this, because this will break it
-						C_Timer.After(0, function()
-							UnmuteSoundFile(567518)
-							ChatFrame1:RegisterEvent("CHAT_MSG_SYSTEM") -- Re-enable the system message prints "player has come online"
-						end)
-					end
+			if BADBOY_LEVELS_DB.allowfriends then
+				local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
+				if isBnetFriend or C_FriendList.IsFriend(guid) then
+					allow = true
 				end
 			end
-		end
-	end
-end
-
-function mod:CHAT_MSG_WHISPER(_, _, ...)
-	local _, player, _, _, _, flag, _, _, _, _, id, guid = ...
-	if issecretvalue(player) then return end
-	local trimmedPlayer = Ambiguate(player, "none")
-	if good[trimmedPlayer] or flag == "GM" or flag == "DEV" then return end -- don't filter if good or GM
-
-	--[[ Start functionality for blocking all whispers regardless of level ]]--
-	if BADBOY_LEVELS_DB.blockall then
-		local allow = false
-
-		if BADBOY_LEVELS_DB.allowfriends then
-			local isBnetFriend = C_BattleNet.GetGameAccountInfoByGUID(guid)
-			if isBnetFriend or C_FriendList.IsFriend(guid) then
+			if BADBOY_LEVELS_DB.allowguild and IsGuildMember(guid) then
 				allow = true
 			end
-		end
-		if BADBOY_LEVELS_DB.allowguild and IsGuildMember(guid) then
-			allow = true
-		end
-		if BADBOY_LEVELS_DB.allowgroup and C_PartyInfo.IsGUIDInGroup(guid) then
-			allow = true
-		end
-
-		if not allow then
-			if not whispered[trimmedPlayer] then
-				whispered[trimmedPlayer] = true
-				C_ChatInfo.SendChatMessage(whisp_notallowed, "WHISPER", nil, trimmedPlayer)
-				C_Timer.After(60, function() whispered[trimmedPlayer] = nil end)
+			if BADBOY_LEVELS_DB.allowgroup and C_PartyInfo.IsGUIDInGroup(guid) then
+				allow = true
 			end
-			idsToFilter[id] = true
-		end
 
-		return
-	end
-	--[[ End functionality for blocking all whispers regardless of level ]]--
+			if not allow then
+				if not playersAlreadyWarned[guid] then
+					playersAlreadyWarned[guid] = true
+					local trimmedPlayer = Ambiguate(player, "none")
+					C_ChatInfo.SendChatMessage(L_whisper_notallowed, "WHISPER", nil, trimmedPlayer)
+					C_Timer.After(60, function() playersAlreadyWarned[guid] = nil end)
+				end
+				chatMessageIDsToFilter[id] = true
+			end
 
-	--we can only filter whispers from realms connected to ours
-	if trimmedPlayer:find("-", nil, true) then
-		local whisperRealm = trimmedPlayer:gsub("^[^%-]+%-(.+)", "%1")
-		if not connectedRealms[whisperRealm] then
 			return
 		end
-	end
-	--don't filter if guild member, character friend, bnet friend, or in our group
-	if BadBoyIsFriendly(guid, flag) then return end
+		--[[ End functionality for blocking all whispers regardless of level ]]--
 
-	if not maybe[trimmedPlayer] then maybe[trimmedPlayer] = {} end --added to maybe
-	--store all the chat arguments incase we need to add it back (if it's a new good guy)
-	if not maybe[trimmedPlayer][id] then maybe[trimmedPlayer][id] = {select("#", ...), ...} end
+		--don't filter if guild member, character friend, bnet friend, or in our group
+		if BadBoyIsFriendly(guid, flag) then return end
 
-	local level = BADBOY_LEVELS_DB.level
-	--Don't try to add a player to friends several times for 1 whisper (registered to more than 1 chat frame)
-	if not filterTable[trimmedPlayer] or filterTable[trimmedPlayer] ~= level then
-		filterTable[trimmedPlayer] = level
-		idsToFilter[id] = true
-		-- Mute the new "player has come online" sound that plays when a friend is added.
-		-- Hopefully no one is actually muting this, because this will break it when it's unmuted above
-		MuteSoundFile(567518)
-		ChatFrame1:UnregisterEvent("CHAT_MSG_SYSTEM") -- Block system messages "player has come online" and "player added to friends"
-		C_FriendList.AddFriend(trimmedPlayer, "badboy_temp")
-	else
-		idsToFilter[id] = true
-	end
-end
+		local _, _, _, _, _, _, _, level = GetPlayerInfoByGUID(guid)
+		if type(level) ~= "number" then return end
 
-function mod:CHAT_MSG_WHISPER_INFORM(_,_,msg,player, _, _, _, _, _, _, _, _, id)
-	if issecretvalue(msg) then return end
-	local trimmedPlayer = Ambiguate(player, "none")
-	if good[trimmedPlayer] then return end --Do nothing if on safe list
-	if msg:find("^BadBoy_Levels: ") then
-		idsToFilter[id] = true --Filter auto-response
-		return
+		if level < BADBOY_LEVELS_DB.level then
+			if not playersAlreadyWarned[guid] then
+				playersAlreadyWarned[guid] = true
+				local trimmedPlayer = Ambiguate(player, "none")
+				C_ChatInfo.SendChatMessage(L_whisper_toolow:format(BADBOY_LEVELS_DB.level), "WHISPER", nil, trimmedPlayer)
+				C_Timer.After(60, function() playersAlreadyWarned[guid] = nil end)
+			end
+			chatMessageIDsToFilter[id] = true
+		else
+			goodPlayersNeverFiltered[guid] = true
+		end
+	elseif event == "CHAT_MSG_WHISPER_INFORM" then
+		if issecretvalue(msg) or issecretvalue(guid) or issecretvalue(id) then return end
+		if goodPlayersNeverFiltered[guid] then return end --Do nothing if on safe list
+		if msg:find("^BadBoy_Levels: ") then
+			chatMessageIDsToFilter[id] = true --Filter auto-response
+			return
+		end
+		goodPlayersNeverFiltered[guid] = true --If we want to whisper someone, they're good
 	end
-	good[trimmedPlayer] = true --If we want to whisper someone, they're good
-end
+end)
+badboy:RegisterEvent("CHAT_MSG_WHISPER")
+badboy:RegisterEvent("CHAT_MSG_WHISPER_INFORM")
 
 -- whisper filtering function
 local function filter(_, _, _, _, _, _, _, _, _, _, _, _, id)
-	if issecretvalue(id) then return end
-	if type(id) == "number" and idsToFilter[id] then
-		return true --filter everything not good (maybe)
+	if not issecretvalue(id) and type(id) == "number" and chatMessageIDsToFilter[id] then
+		return true
 	end
 end
 ChatFrameUtil.AddMessageEventFilter("CHAT_MSG_WHISPER", filter)
